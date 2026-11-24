@@ -39,6 +39,9 @@ class BatchPlayer extends Base
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $froms = $param['froms'] ?? [];
         $status = intval($param['status'] ?? 1);
@@ -75,6 +78,9 @@ class BatchPlayer extends Base
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $sorts = $param['sorts'] ?? [];
 
@@ -103,6 +109,9 @@ class BatchPlayer extends Base
      */
     public function batchParse()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
@@ -142,6 +151,9 @@ class BatchPlayer extends Base
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $froms = $param['froms'] ?? [];
 
@@ -174,6 +186,9 @@ class BatchPlayer extends Base
      */
     public function replaceFrom()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }

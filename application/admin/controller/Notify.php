@@ -67,6 +67,9 @@ class Notify extends Base
 
     public function broadcast()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input('post.');
         $type = isset($param['notify_type']) ? trim($param['notify_type']) : '';
         $title = isset($param['notify_title']) ? trim($param['notify_title']) : '';

@@ -57,6 +57,19 @@ foreach ($forced as $cls => $fns) {
     }
 }
 
+// 在线升级分步流程保留 GET 重定向，但每一步必须校验同一会话 CSRF 令牌。
+$update = rt_functions(APP_PATH . 'admin/controller/Update.php');
+foreach (['step1', 'step2', 'step3'] as $fn) {
+    rt_check(isset($update[$fn]), "[updater_csrf] Update::{$fn} not found");
+    if (isset($update[$fn])) {
+        rt_check(strpos($update[$fn]['body'], '$this->updateCsrfOk()') !== false,
+            "[updater_csrf] Update::{$fn} must validate session token");
+    }
+}
+rt_check(isset($update['updateCsrfOk'])
+    && strpos($update['updateCsrfOk']['body'], 'CsrfGuard::tokenAccepted(') !== false,
+    '[updater_csrf] Update::updateCsrfOk must delegate to CsrfGuard');
+
 // Base::adminCsrfOk 必须走与 CsrfGuard 相同的判定，且不读全局开关
 $base = rt_functions(APP_PATH . 'admin/controller/Base.php');
 rt_check(isset($base['adminCsrfOk']), '[forced_csrf] Base::adminCsrfOk missing');

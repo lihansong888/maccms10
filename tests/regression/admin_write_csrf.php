@@ -9,8 +9,11 @@ require __DIR__ . '/lib/bootstrap.php';
 
 // ─── 列 forced_csrf：以下写接口必须在入口调用 $this->adminCsrfOk() ───
 $forced = [
-    'Collect'       => ['healthtoggle'],
+    'Admin'         => ['del'],
+    'Card'          => ['del'],
+    'Collect'       => ['del', 'healthtoggle'],
     'ResourceCheck' => ['enable', 'disable'],
+    'Template'      => ['del'],
 ];
 foreach ($forced as $cls => $fns) {
     $funcs = rt_functions(APP_PATH . "admin/controller/{$cls}.php");
@@ -19,6 +22,8 @@ foreach ($forced as $cls => $fns) {
         if (isset($funcs[$fn])) {
             rt_check(strpos($funcs[$fn]['body'], '$this->adminCsrfOk()') !== false,
                 "[forced_csrf] {$cls}::{$fn}: must call \$this->adminCsrfOk() (global security_csrf_admin is off by default)");
+            rt_check(strpos($funcs[$fn]['body'], 'Request()->isPost()') !== false,
+                "[forced_csrf] {$cls}::{$fn}: must reject non-POST requests");
         }
     }
 }

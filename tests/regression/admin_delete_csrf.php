@@ -107,11 +107,22 @@ foreach (['info','program','col_all','col_url','col_content','content_del','cont
     if (isset($cj[$action])) {
         $body = $cj[$action]['body'];
         rt_check(strpos($body, 'adminCsrfOk()') !== false, "[cj_csrf] {$action} validates CSRF");
-        if ($action !== 'info') {
+        if (in_array($action, ['col_all','col_url','col_content','content_into'], true)) {
+            rt_check(strpos($body, '$this->collectionRequestAllowed()') !== false, "[cj_csrf] {$action} requires protected admin POST or authenticated scheduler call");
+        } elseif ($action !== 'info') {
             rt_check(strpos($body, 'Request()->isPost()') !== false, "[cj_csrf] {$action} requires POST");
         }
     }
 }
+$cjGuard = isset($cj['collectionRequestAllowed']) ? $cj['collectionRequestAllowed']['body'] : '';
+rt_check(strpos($cjGuard, '$this->isInternalTimmingRequest()') !== false, '[cj_csrf] scheduled collection is explicitly recognized');
+rt_check(strpos($cjGuard, '$this->adminCsrfOk()') !== false, '[cj_csrf] direct admin collection requires CSRF');
+$internalScheduler = rt_functions(APP_PATH . 'api/controller/Timming.php');
+rt_check(isset($internalScheduler['cj']), '[cj_csrf] scheduler collection entry point exists');
+if (isset($internalScheduler['cj'])) {
+    rt_check(strpos($internalScheduler['cj']['body'], '$request->col_all($output)') !== false, '[cj_csrf] scheduled collection call remains compatible');
+}
+
 $cjView = file_get_contents(APP_PATH . 'admin/view_new/cj/index.html');
 rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_url\')') !== false, '[cj_csrf] URL collection iframe uses POST');
 rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_content\')') !== false, '[cj_csrf] content collection iframe uses POST');

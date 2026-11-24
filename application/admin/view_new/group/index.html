@@ -47,7 +47,7 @@
                 <td>
                     <a class="layui-badge-rim j-iframe" data-href="{:url('info?id='.$vo['group_id'])}" href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
                     {if condition="$vo['group_id'] gt 2"}
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['group_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['group_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                     {/if}
                 </td>
             </tr>

@@ -408,8 +408,8 @@ layui.define(['element', 'form'], function (exports) {
                             location.reload();
                         }
                     }
-                }, 'json');
-            });
+                });
+            }, 'json');
             layer.close();
         }
         else {
@@ -424,8 +424,8 @@ layui.define(['element', 'form'], function (exports) {
                                 location.reload();
                             }
                         }
-                    }, 'json');
-                });
+                    });
+                }, 'json');
                 layer.close(index);
             });
         }

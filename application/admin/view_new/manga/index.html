@@ -191,12 +191,12 @@
                 <td class="mac-table-opt-cell">
                     <div class="mac-table-opt-btns">
                     {if condition="$param.recycle eq 1"}
-                    <a class="layui-btn layui-btn-normal j-tr-del" data-href="{:url('restore?ids='.$vo['manga_id'])}" href="javascript:;" title="{:lang('recycle_restore')}">{:lang('recycle_restore')}</a>
-                    <a class="layui-btn layui-btn-danger j-tr-del" data-href="{:url('del?ids='.$vo['manga_id'].'&purge=1')}" href="javascript:;" title="{:lang('recycle_purge')}">{:lang('recycle_purge')}</a>
+                    <a class="layui-btn layui-btn-normal j-tr-del" data-method="post" data-href="{:url('restore?ids='.$vo['manga_id'])}" href="javascript:;" title="{:lang('recycle_restore')}">{:lang('recycle_restore')}</a>
+                    <a class="layui-btn layui-btn-danger j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['manga_id'].'&purge=1')}" href="javascript:;" title="{:lang('recycle_purge')}">{:lang('recycle_purge')}</a>
                     {else/}
                     <a href="javascript:;" class="layui-btn layui-btn-warm j-ai-seo-row" data-id="{$vo.manga_id}" title="{:lang('admin/ai_seo/list_row_btn')}">{:lang('admin/ai_seo/list_row_btn')}</a>
                     <a class="layui-btn layui-btn-primary j-iframe" data-full="1" data-href="{:url('info?id='.$vo['manga_id'])}" href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-btn layui-btn-danger j-tr-del" data-href="{:url('del?ids='.$vo['manga_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-btn layui-btn-danger j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['manga_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                     {/if}
                     </div>
                 </td>

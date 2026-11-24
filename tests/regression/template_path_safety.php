@@ -11,7 +11,7 @@ $functions = rt_functions(APP_PATH . 'admin/controller/Template.php');
 rt_check(isset($functions['resolveTemplateFilePath']), 'template path resolver exists');
 $body = isset($functions['resolveTemplateFilePath']) ? $functions['resolveTemplateFilePath']['body'] : '';
 rt_check(strpos($body, 'realpath(') !== false, 'path resolution uses canonical filesystem paths');
-rt_check(strpos($body, "strpos($path, './template/') !== 0") !== false, 'path must begin inside template root');
+rt_check(strpos($body, "strpos(" . '$path' . ", './template/') !== 0") !== false, 'path must begin inside template root');
 rt_check(strpos($body, "=== '..'") !== false, 'parent traversal segments are rejected');
 rt_check(strpos($body, 'is_file($real)') !== false, 'existing targets must be regular files');
 rt_check(strpos($body, 'strpos($real, $prefix) !== 0') !== false, 'resolved symlink targets must remain under template root');

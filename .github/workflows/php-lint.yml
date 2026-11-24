@@ -32,4 +32,6 @@ jobs:
             -not -path './.git/*' \
             -not -path './runtime/*' \
             -not -path './application/data/*' \
+            -not -path './vendor/*' \
+            -not -path './thinkphp/*' \
             -print0)

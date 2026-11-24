@@ -1478,8 +1478,9 @@ class User extends Base
 
             $update = [];
             $update['user_pwd'] = mac_hash_password_for_column($password_raw, 'user', 'user_pwd');
-            $res = $this->where($where)->update($update);
-            if ($res === false) {
+            // 只更新前面确认过的单个用户 ID；邮箱/手机号可能因历史数据重复，不能用原条件批量改密。
+            $res = $this->where(['user_id' => intval($user['user_id'])])->update($update);
+            if ($res !== 1) {
                 Db::rollback();
                 return ['code'=>2009,'msg'=>lang('model/user/pass_reset_err')];
             }

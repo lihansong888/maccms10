@@ -68,6 +68,18 @@ if (isset($notify['broadcast'])) {
     rt_check(strpos($notify['broadcast']['body'], '$this->adminCsrfOk()') !== false, '[notify_csrf] broadcast validates CSRF');
 }
 
+$addon = rt_functions(APP_PATH . 'admin/controller/Addon.php');
+foreach (['state','uninstall'] as $action) {
+    rt_check(isset($addon[$action]), "[addon_csrf] Addon::{$action} exists");
+    if (isset($addon[$action])) {
+        $body = $addon[$action]['body'];
+        rt_check(strpos($body, 'isPost()') !== false, "[addon_csrf] {$action} requires POST");
+        rt_check(strpos($body, "Loader::validate('Token')") !== false, "[addon_csrf] {$action} validates token");
+    }
+}
+$addonView = file_get_contents(APP_PATH . 'admin/view_new/box/index.html');
+rt_check(substr_count($addonView, "type: 'post'") >= 2, '[addon_csrf] addon state and uninstall use POST');
+
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");

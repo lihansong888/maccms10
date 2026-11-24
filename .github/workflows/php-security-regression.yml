@@ -1,0 +1,30 @@
+name: PHP Security Regression
+
+on:
+  push:
+    branches:
+      - security-audit-clean
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  php-security-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: PHP syntax checks
+        run: |
+          php -l application/common/model/Collect.php
+          php -l application/common/model/Card.php
+          php -l tests/regression/ssrf_collection.php
+          php -l tests/regression/card_redemption_transaction.php
+      - name: Collection SSRF regression
+        run: php tests/regression/ssrf_collection.php
+      - name: Card redemption regression
+        run: php tests/regression/card_redemption_transaction.php

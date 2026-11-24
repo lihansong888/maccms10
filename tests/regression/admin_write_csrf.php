@@ -13,6 +13,7 @@ $forced = [
     'Card'          => ['del', 'info'],
     'Collect'       => ['del', 'healthtoggle'],
     'Coupon'        => ['save', 'del', 'field'],
+    'Database'      => ['export', 'uploadStorage', 'import', 'optimize', 'repair', 'del'],
     'Group'         => ['info', 'del', 'field'],
     'Order'         => ['del'],
     'ResourceCheck' => ['enable', 'disable'],
@@ -26,7 +27,8 @@ foreach ($forced as $cls => $fns) {
         if (isset($funcs[$fn])) {
             rt_check(strpos($funcs[$fn]['body'], '$this->adminCsrfOk()') !== false,
                 "[forced_csrf] {$cls}::{$fn}: must call \$this->adminCsrfOk() (global security_csrf_admin is off by default)");
-            $postGuard = strpos($funcs[$fn]['body'], 'Request()->isPost()') !== false;
+            $postGuard = strpos($funcs[$fn]['body'], 'Request()->isPost()') !== false
+                || strpos($funcs[$fn]['body'], '$this->request->isPost()') !== false;
             // ResourceCheck::enable/disable share a private targetIds() helper that rejects non-POST requests.
             if (!$postGuard && strpos($funcs[$fn]['body'], 'targetIds()') !== false && isset($funcs['targetIds'])) {
                 $postGuard = strpos($funcs['targetIds']['body'], 'Request()->isPost()') !== false;

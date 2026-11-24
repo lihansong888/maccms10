@@ -27,12 +27,14 @@ jobs:
           php -l application/common/model/Actor.php
           php -l application/admin/controller/Cash.php
           php -l application/admin/controller/User.php
+          php -l application/index/controller/Comment.php
           php -l tests/regression/ssrf_collection.php
           php -l tests/regression/card_redemption_transaction.php
           php -l tests/regression/template_path_safety.php
           php -l tests/regression/sql_order_injection.php
           php -l tests/regression/template_expression_safety.php
           php -l tests/regression/admin_write_csrf.php
+          php -l tests/regression/comment_mass_assignment.php
       - name: Collection SSRF regression
         run: php tests/regression/ssrf_collection.php
       - name: Card redemption regression
@@ -45,3 +47,5 @@ jobs:
         run: php tests/regression/template_expression_safety.php
       - name: Admin CSRF regression
         run: php tests/regression/admin_write_csrf.php
+      - name: Public comment mass assignment regression
+        run: php tests/regression/comment_mass_assignment.php

@@ -46,7 +46,7 @@
                 <td>{$vo.milestone_time_add|mac_day='color'}</td>
                 <td>
                     <a data-href="{:url('info?id='.$vo['milestone_id'])}" data-width="800px" data-height="550px" class="layui-badge-rim j-iframe" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['milestone_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['milestone_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

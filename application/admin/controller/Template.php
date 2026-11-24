@@ -178,6 +178,9 @@ class Template extends Base
         $this->assign('filter',$filter);
 
         if (Request()->isPost()) {
+            if (empty($GLOBALS['config']['app']['security_template_editor'])) {
+                return $this->error('模板文件在线编辑已禁用，请通过安全部署流程修改模板');
+            }
             $validate = \think\Loader::validate('Token');
             if(!$validate->check($param)){
                 return $this->ajaxErrorWithFreshToken($validate->getError());
@@ -213,6 +216,9 @@ class Template extends Base
 
     public function del()
     {
+        if (empty($GLOBALS['config']['app']['security_template_editor'])) {
+            return $this->error('模板文件在线删除已禁用');
+        }
         $param = input();
         $fname = $param['fname'];
         if(!empty($fname)){

@@ -60,7 +60,7 @@
                 <td>{if condition="$vo.task_status eq 0"}<span class="layui-badge">{:lang('disable')}</span>{else}<span class="layui-badge layui-bg-green">{:lang('normal')}</span>{/if}</td>
                 <td>
                     <a data-href="{:url('info?id='.$vo['task_id'])}" data-width="900px" data-height="600px" class="layui-badge-rim j-iframe" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['task_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['task_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

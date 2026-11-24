@@ -49,13 +49,15 @@ class UserPm extends Base
 
     public function send(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         $user = $this->_checkLoginForApi();
         if (!$user) {
             return json(['code' => 1010, 'msg' => lang('pm/login_required')]);
         }
-        $csrfErr = $this->checkCsrf();
-        if ($csrfErr) {
-            return json($csrfErr);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr) return json($csrfErr);
         }
         $param = $request->param();
         $to_uid = intval($param['to_uid'] ?? 0);

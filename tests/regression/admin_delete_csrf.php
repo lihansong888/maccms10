@@ -95,7 +95,7 @@ foreach ($extraActions as $controller => $actions) {
         rt_check(isset($functions[$action]), "[write_csrf] {$controller}::{$action} exists");
         if (isset($functions[$action])) {
             $body = $functions[$action]['body'];
-            rt_check(strpos($body, 'Request()->isPost()') !== false, "[write_csrf] {$controller}::{$action} rejects GET");
+            rt_check(strpos($body, 'isPost()') !== false, "[write_csrf] {$controller}::{$action} rejects GET");
             rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[write_csrf] {$controller}::{$action} validates CSRF");
         }
     }

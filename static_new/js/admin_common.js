@@ -211,6 +211,50 @@ layui.define(['element', 'form'], function (exports) {
             _ids = ids.join(',');
             _url = _url.indexOf('?') > -1 ? _url + '&ids=' + _ids : _url + '?ids=' + _ids;
         }
+        if (String(that.attr('data-method') || 'get').toLowerCase() === 'post') {
+            var csrfToken = window.__MAC_ADMIN_CSRF__ || '';
+            if (!csrfToken) {
+                layer.msg('安全令牌缺失，请刷新页面后重试');
+                return false;
+            }
+            var frameName = 'macAdminPostFrame_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            var postLayer = layer.open({
+                type: 2,
+                title: _title,
+                content: 'about:blank',
+                area: [_width + '', _height + ''],
+                success: function (layero) {
+                    var frame = layero.find('iframe')[0];
+                    if (!frame) {
+                        layer.msg('无法创建操作窗口');
+                        return;
+                    }
+                    frame.name = frameName;
+                    var postForm = document.createElement('form');
+                    postForm.method = 'POST';
+                    postForm.action = _url;
+                    postForm.target = frameName;
+                    postForm.style.display = 'none';
+                    var tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '__token__';
+                    tokenInput.value = csrfToken;
+                    postForm.appendChild(tokenInput);
+                    document.body.appendChild(postForm);
+                    postForm.submit();
+                    setTimeout(function () {
+                        if (postForm.parentNode) {
+                            postForm.parentNode.removeChild(postForm);
+                        }
+                    }, 0);
+                }
+            });
+            if (_full == '1') {
+                layer.full(postLayer);
+            }
+            return false;
+        }
+
         var lay = layer.open({ type: 2, title: _title, content: _url, area: [_width + '', _height + ''] });
         if (_full == '1') {
             layer.full(lay);

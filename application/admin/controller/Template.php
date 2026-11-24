@@ -223,24 +223,43 @@ class Template extends Base
             return $this->error('模板文件在线删除已禁用');
         }
         $param = input();
-        $fname = $param['fname'];
-        if(!empty($fname)){
-            if(!is_array($fname)){
-                $fname = [$fname];
+        $fname = isset($param['fname']) ? $param['fname'] : [];
+        if (!is_array($fname)) {
+            $fname = [$fname];
+        }
+
+        $templateRoot = realpath(ROOT_PATH . 'template');
+        if ($templateRoot === false) {
+            return $this->error(lang('param_err'));
+        }
+
+        $deleted = 0;
+        foreach ($fname as $a) {
+            if (!is_string($a) || $a === '') {
+                continue;
             }
-            foreach($fname as $a){
-                $a = str_replace('\\','/',$a);
+            $a = str_replace('\\', '/', $a);
+            $a = mac_convert_encoding($a, "UTF-8", "GB2312");
+            $target = realpath($a);
+            if ($target === false || !is_file($target)) {
+                continue;
+            }
 
-                if( (substr($a,0,10) != "./template") || count( explode("./",$a) ) > 2) {
+            // realpath 后再做目录边界检查，阻止 ../ 穿越及指向模板目录外的符号链接
+            $prefix = rtrim($templateRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            if (strpos($target, $prefix) !== 0) {
+                continue;
+            }
 
-                }
-                else{
-                    $a = mac_convert_encoding($a,"UTF-8","GB2312");
-                    if(file_exists($a)){ @unlink($a); }
-                }
+            if (@unlink($target)) {
+                $deleted++;
             }
         }
-        return $this->success(lang('del_ok'));
+
+        if ($deleted < 1) {
+            return $this->error(lang('param_err'));
+        }
+        return $this->success(lang('del_ok'), null, ['deleted' => $deleted]);
     }
 
     public function wizard()

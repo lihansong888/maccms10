@@ -22,8 +22,13 @@ foreach ($forced as $cls => $fns) {
         if (isset($funcs[$fn])) {
             rt_check(strpos($funcs[$fn]['body'], '$this->adminCsrfOk()') !== false,
                 "[forced_csrf] {$cls}::{$fn}: must call \$this->adminCsrfOk() (global security_csrf_admin is off by default)");
-            rt_check(strpos($funcs[$fn]['body'], 'Request()->isPost()') !== false,
-                "[forced_csrf] {$cls}::{$fn}: must reject non-POST requests");
+            $postGuard = strpos($funcs[$fn]['body'], 'Request()->isPost()') !== false;
+            // ResourceCheck::enable/disable share a private targetIds() helper that rejects non-POST requests.
+            if (!$postGuard && strpos($funcs[$fn]['body'], 'targetIds()') !== false && isset($funcs['targetIds'])) {
+                $postGuard = strpos($funcs['targetIds']['body'], 'Request()->isPost()') !== false;
+            }
+            rt_check($postGuard,
+                "[forced_csrf] {$cls}::{$fn}: must reject non-POST requests directly or through its request-validation helper");
         }
     }
 }

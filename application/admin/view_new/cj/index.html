@@ -60,6 +60,7 @@
             elem: '.layui-upload'
             ,url: "{:url('cj/import')}"
             ,method: 'post'
+            ,data: {__token__: window.__MAC_ADMIN_CSRF__ || ''}
             ,exts:'txt'
             ,before: function(input) {
                 layer.msg("{:lang('upload_ing')}", {time:3000000});

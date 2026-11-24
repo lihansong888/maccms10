@@ -647,6 +647,9 @@ class Vod extends Base
      */
     public function contentLangTranslate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -665,6 +668,9 @@ class Vod extends Base
 
     public function aiSeoGenerate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!Request()->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request'), 'data' => []]);
         }
@@ -686,6 +692,9 @@ class Vod extends Base
 
     public function aiCoverGenerate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!Request()->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request'), 'data' => []]);
         }
@@ -715,6 +724,9 @@ class Vod extends Base
 
     public function aiCoverRevert()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!Request()->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request'), 'data' => []]);
         }
@@ -737,6 +749,9 @@ class Vod extends Base
     public function iplot()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
             $res = model('Vod')->savePlot($param);
             if($res['code']>1){
@@ -979,6 +994,9 @@ class Vod extends Base
 
     public function updateToday()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $flag = $param['flag'];
         $res = model('Vod')->updateToday($flag);

@@ -42,7 +42,7 @@
                             <div class="layui-input-inline w150"><input type="text" name="domain[map_dir][]" class="layui-input" placeholder="{:lang('map_dir')}" value="{$vo.map_dir}"></div>
                             <div class="layui-input-inline w150"><select name="domain[mob_template_dir][]"><option value="no">{:lang('admin/system/config/mob_template_dir')}.</option>{volist name="templates" id="vo3"}<option value="{$vo3}" {if condition="$vo3 eq $vo.mob_template_dir"}selected{/if}>{$vo3}</option>{/volist}</select></div>
                             <div class="layui-input-inline w150"><input type="text" name="domain[site_wapurl][]" class="layui-input" placeholder="{:lang('admin/system/config/site_wapurl')}" value="{$vo.site_wapurl}"></div>
-                            <div> <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['site_url'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a></div>
+                            <div> <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['site_url'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a></div>
                         </div>
                         {/volist}
                     </div>

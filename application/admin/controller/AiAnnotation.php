@@ -75,6 +75,9 @@ class AiAnnotation extends Base
      */
     public function generate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         if (!$this->checkAjaxToken($param)) {
             return json(['code' => 0, 'msg' => lang('param_err')]);
@@ -114,6 +117,9 @@ class AiAnnotation extends Base
 
     public function adopt()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         if (!$this->checkAjaxToken($param)) {
             return json(['code' => 0, 'msg' => lang('param_err')]);
@@ -137,6 +143,9 @@ class AiAnnotation extends Base
 
     public function reject()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         if (!$this->checkAjaxToken($param)) {
             return json(['code' => 0, 'msg' => lang('param_err')]);

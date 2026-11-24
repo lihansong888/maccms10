@@ -30,7 +30,7 @@
                 <td>{:date('Y-m-d H:i:s', $vo['time'])}</td>
                 <td>
                     <div class="layui-btn-group">
-                        <a data-href="{:url('import?id='.strtotime($key))}" class="layui-badge-rim layui-btn-small j-ajax" confirm="{:lang('admin/database/import_confirm')}">{:lang('admin/database/import')}</a>
+                        <a data-href="{:url('import?id='.strtotime($key))}" class="layui-badge-rim layui-btn-small j-ajax" data-method="post" confirm="{:lang('admin/database/import_confirm')}">{:lang('admin/database/import')}</a>
                         {if condition="$upload_storage_ready"}
                         <a data-href="{:url('uploadStorage?id='.strtotime($key))}" class="layui-badge-rim layui-btn-small j-ajax" confirm="{:lang('admin/database/upload_storage_confirm')}">{:lang('admin/database/upload_storage_btn')}</a>
                         {/if}

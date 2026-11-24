@@ -60,7 +60,7 @@
                 <td>{if condition="$vo.pm_status eq 0"}<span class="layui-badge">{:lang('disable')}</span>{else}<span class="layui-badge layui-bg-green">{:lang('normal')}</span>{/if}</td>
                 <td>{$vo.pm_time|mac_day='color'}</td>
                 <td>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['pm_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['pm_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

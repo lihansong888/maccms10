@@ -3,6 +3,7 @@ namespace app\common\model;
 
 use app\common\util\JwtService;
 use think\Db;
+use think\Cache;
 use think\View;
 use app\common\validate\User as UserValidate;
 
@@ -1423,8 +1424,17 @@ class User extends Base
 
         $param['type'] = 2;
         $param['to']   = $to_src;
+
+        // 找回密码验证码失败尝试限速：按 IP + 收件目标分别计数，10 分钟最多 5 次
+        $attemptKey = 'maccms_findpass_attempt_' . md5(strtolower((string)$param['ac']) . '|' . strtolower($to_src) . '|' . (string)mac_get_ip_long());
+        $attempts = (int)Cache::get($attemptKey);
+        if ($attempts >= 5) {
+            return ['code' => 2010, 'msg' => '验证码尝试次数过多，请 10 分钟后再试'];
+        }
+
         $res = $this->check_msg($param);
         if($res['code'] >1){
+            Cache::set($attemptKey, $attempts + 1, 600);
             return ['code'=>$res['code'],'msg'=>$res['msg']];
         }
         $msg_id = $res['msg_id'];
@@ -1469,6 +1479,7 @@ class User extends Base
         if($res===false){
             return ['code'=>2009,'msg'=>lang('model/user/pass_reset_err')];
         }
+        Cache::rm($attemptKey);
         return ['code'=>1,'msg'=>lang('model/user/pass_reset_ok')];
     }
 

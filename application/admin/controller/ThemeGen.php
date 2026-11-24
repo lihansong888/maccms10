@@ -20,6 +20,9 @@ class ThemeGen extends Base
     public function index()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             return $this->generate();
         }
 

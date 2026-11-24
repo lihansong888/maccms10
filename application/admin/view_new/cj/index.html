@@ -36,7 +36,7 @@
                     <a class="layui-btn layui-btn-primary layui-btn-xs j-iframe" data-full="1" data-href="{:url('info')}?id={$vo.nodeid}" title="{:lang('edit')}">{:lang('edit')}</a>
                     <a class="layui-btn layui-btn-primary layui-btn-xs j-iframe" data-href="{:url('program')}?id={$vo.nodeid}" title="{:lang('admin/cj/publish_plan')}">{:lang('admin/cj/publish_plan')}</a>
                     <a class="layui-btn layui-btn-primary layui-btn-xs" href="{:url('export')}?id={$vo.nodeid}" title="{:lang('export')}">{:lang('export')}</a>
-                    <a class="layui-btn layui-btn-primary layui-btn-xs j-tr-del" href="{:url('del')}?ids={$vo.nodeid}" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-btn layui-btn-primary layui-btn-xs j-tr-del" data-method="post" href="{:url('del')}?ids={$vo.nodeid}" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

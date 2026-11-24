@@ -40,4 +40,33 @@ rt_same(false, $g::tokenAccepted('x', 'abc', 'def'), 'wrong token rejected');
 rt_same(true, $g::tokenAccepted('abc', 'abc', ''), 'stable token accepted');
 rt_same(true, $g::tokenAccepted('def', 'abc', 'def'), 'legacy token accepted');
 
+// 已披露的 GET-CSRF 写接口：必须同时拒绝 GET 并校验会话 CSRF 令牌。
+$csrfActions = [
+    'Cash' => ['del', 'audit'],
+    'User' => ['del', 'field'],
+];
+foreach ($csrfActions as $cls => $actions) {
+    $funcs = rt_functions(APP_PATH . "admin/controller/{$cls}.php");
+    foreach ($actions as $action) {
+        rt_check(isset($funcs[$action]), "[csrf] {$cls}::{$action} exists");
+        if (isset($funcs[$action])) {
+            $body = $funcs[$action]['body'];
+            rt_check(strpos($body, 'Request()->isPost()') !== false, "[csrf] {$cls}::{$action} rejects GET");
+            rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[csrf] {$cls}::{$action} validates token");
+        }
+    }
+}
+
+$cashView = file_get_contents(APP_PATH . 'admin/view_new/cash/index.html');
+rt_check(strpos($cashView, 'j-tr-del" data-method="post"') !== false, '[csrf] cash row delete sends POST');
+rt_check(strpos($cashView, 'j-ajax" data-method="post"') !== false, '[csrf] cash audit/clear actions send POST');
+$userView = file_get_contents(APP_PATH . 'admin/view_new/user/index.html');
+rt_check(strpos($userView, 'data-method="post"') !== false, '[csrf] user status and row delete send POST');
+
+foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $jsPath) {
+    $js = file_get_contents(ROOT_PATH . $jsPath);
+    rt_check(strpos($js, 'function macAdminActionRequest') !== false, "[csrf] {$jsPath} supports method-aware actions");
+    rt_check(strpos($js, "that.attr('data-method')") !== false, "[csrf] {$jsPath} reads POST method from protected controls");
+}
+
 rt_done('admin write endpoints forced CSRF');

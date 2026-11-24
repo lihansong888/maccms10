@@ -34,7 +34,7 @@
                 <td>
                     <a class="layui-badge-rim j-clipboard" data-clipboard-target="#txt{$key}" href="javascript:;" title="{:lang('copy')}">{:lang('copy')}</a>
                     <a class="layui-badge-rim j-iframe" data-full="1" data-href="{:url('info')}?fpath={$vo.path}&fname={$vo.name}" href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del')}?fname={$vo.fullname}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del')}?fname={$vo.fullname}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}
@@ -71,7 +71,12 @@
             id  = checkIds('fname[]');
         }
         layer.confirm("{:lang('del_confirm')}", function (index) {
-            location.href = "{:url('template/del')}?fname=" + id;
+            $.post("{:url('template/del')}", { fname: id }, function (res) {
+                layer.msg(res.msg);
+                if (res.code == 1) {
+                    location.reload();
+                }
+            });
         });
     }
 

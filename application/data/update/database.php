@@ -191,8 +191,9 @@ foreach ($innodb_tables as $innodb_table) {
     if (empty($col_list[$innodb_table])) {
         continue;
     }
-    $table_status = \think\Db::query("SHOW TABLE STATUS LIKE '" . $innodb_table . "'");
-    if (empty($table_status[0]['Engine']) || strtolower($table_status[0]['Engine']) === 'innodb') {
+    // Update::step2 已从 information_schema.tables 预载精确表名与引擎，避免 LIKE 中下划线被当作通配符。
+    $table_engine = isset($engine_list[$innodb_table]) ? strtolower((string)$engine_list[$innodb_table]) : '';
+    if ($table_engine === '' || $table_engine === 'innodb') {
         continue;
     }
     $sql .= "ALTER TABLE `{$innodb_table}` ENGINE=InnoDB;";

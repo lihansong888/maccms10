@@ -30,6 +30,9 @@ jobs:
           php -l application/admin/controller/Monitor.php
           php -l application/admin/controller/Notify.php
           php -l application/index/controller/Comment.php
+          php -l application/index/controller/Gbook.php
+          php -l application/api/controller/Comment.php
+          php -l application/api/controller/Gbook.php
           php -l application/common/model/User.php
           php -l application/common/util/Collection.php
           php -l application/common/model/Image.php

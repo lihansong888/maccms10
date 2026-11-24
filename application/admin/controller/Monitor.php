@@ -223,6 +223,9 @@ class Monitor extends Base
      */
     public function setting_save()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $param = input('post.');
 
         $file = APP_PATH . 'extra/maccms.php';
@@ -339,6 +342,9 @@ class Monitor extends Base
      */
     public function cron_token_reset()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $file = APP_PATH . 'extra/maccms.php';
         $config = config('maccms');
         if (!is_array($config)) {
@@ -412,6 +418,9 @@ class Monitor extends Base
      */
     public function rule_save()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $param = input('post.');
 
         $name = mac_filter_xss(trim((string)(isset($param['rule_name']) ? $param['rule_name'] : '')));
@@ -494,6 +503,9 @@ class Monitor extends Base
      */
     public function rule_del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $id = intval(input('id/d', 0));
         if ($id <= 0) {
             return json(['code' => 0, 'msg' => lang('param_err')]);
@@ -510,6 +522,9 @@ class Monitor extends Base
      */
     public function rule_field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $id = intval(input('post.id/d', 0));
         $status = ((string)input('post.status/s', '0') === '1') ? 1 : 0;
         if ($id <= 0) {
@@ -527,6 +542,9 @@ class Monitor extends Base
      */
     public function rule_enable_recommended()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $n = Db::name('MonitorAlertRule')
             ->where('rule_status', 0)
             ->where('rule_source', 'metric')
@@ -540,6 +558,9 @@ class Monitor extends Base
      */
     public function rule_test()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $channel = strtolower(trim((string)input('post.channel/s', '')));
         $channels = \app\common\util\AlertNotifier::parseChannels($channel);
         if (empty($channels)) {
@@ -606,6 +627,9 @@ class Monitor extends Base
      */
     public function event_ack()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $id = intval(input('post.id/d', 0));
         if ($id <= 0) {
             return json(['code' => 0, 'msg' => lang('param_err')]);
@@ -689,6 +713,9 @@ class Monitor extends Base
      */
     public function access_ban()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $ip = trim((string)input('post.ip/s', ''));
         $res = \app\common\util\IpBanRepository::ban($ip);
         return json($res);
@@ -696,6 +723,9 @@ class Monitor extends Base
 
     public function access_unban()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $ip = trim((string)input('post.ip/s', ''));
         $res = \app\common\util\IpBanRepository::unban($ip);
         return json($res);

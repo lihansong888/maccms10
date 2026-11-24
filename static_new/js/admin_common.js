@@ -227,7 +227,7 @@ layui.define(['element', 'form'], function (exports) {
         form.render('checkbox');
     });
 
-    // 按按钮声明的 data-method 发送写请求；默认保持旧 GET 行为以兼容现有页面。
+    // 后台写操作默认 POST；仅显式声明 data-method="get" 时才保留 GET。
     function macAdminActionRequest(url, data, method, callback) {
         if (String(method || 'post').toLowerCase() === 'post') {
             return $.post(url, data || {}, callback);

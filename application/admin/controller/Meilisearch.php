@@ -79,7 +79,7 @@ class Meilisearch extends Base
      */
     public function save()
     {
-        if (!request()->isPost()) {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('param_err')]);
         }
         $post = input('post.');
@@ -219,7 +219,7 @@ class Meilisearch extends Base
      */
     public function setup()
     {
-        if (!request()->isPost() && !request()->isAjax()) {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
             return json(['code' => 0, 'msg' => lang('param_err')]);
         }
         if (!MeilisearchService::enabled()) {
@@ -238,7 +238,7 @@ class Meilisearch extends Base
      */
     public function sync()
     {
-        if (request()->isPost() || request()->isAjax()) {
+        if (request()->isPost() && $this->adminCsrfOk()) {
             $r = MeilisearchSync::fullReindex();
             return json($r);
         }

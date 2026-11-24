@@ -11,12 +11,12 @@ $collect = rt_functions($collectFile);
 rt_check(isset($collect['checkCjUrl']), 'Collect::checkCjUrl exists');
 $check = isset($collect['checkCjUrl']) ? $collect['checkCjUrl']['body'] : '';
 rt_check(strpos($check, "'http', 'https'") !== false, 'collection URL scheme is restricted to HTTP(S)');
-rt_check(strpos($check, "isset($result['user'])") !== false, 'URL userinfo is rejected');
-rt_check(strpos($check, "isset($result['pass'])") !== false, 'URL password is rejected');
+rt_check(strpos($check, "isset(" . '$result' . "['user'])") !== false, 'URL userinfo is rejected');
+rt_check(strpos($check, "isset(" . '$result' . "['pass'])") !== false, 'URL password is rejected');
 
 $source = file_get_contents($collectFile);
-$unsafeCalls = preg_match_all('/mac_curl_get\\s*\\(\\s*\\$url\\s*,\\s*\\[\\]\\s*,\\s*\\'\\'\\s*,\\s*false\\s*\\)/', $source);
-$safeCalls = preg_match_all('/HttpClient::safeGet\\s*\\(\\s*\\$url\\s*,\\s*30\\s*,\\s*false\\s*\\)/', $source);
+$unsafeCalls = substr_count($source, 'mac_curl_get(');
+$safeCalls = substr_count($source, 'HttpClient::safeGet(');
 rt_same(0, $unsafeCalls, 'no legacy insecure mac_curl_get collection calls remain');
 rt_same(9, $safeCalls, 'all nine remote collection request paths use safeGet');
 

@@ -24,8 +24,22 @@ class Update extends Base
         return $this->fetch('admin@test/index');
     }
 
+    /**
+     * 在线升级分步流程通过 GET 重定向保持输出流，因此使用会话级令牌保护每一步。
+     */
+    protected function updateCsrfOk()
+    {
+        $submitted = (string)input('__token__', '');
+        $stable = (string)\think\Session::get('admin_csrf');
+        $legacy = \think\Session::has('__token__') ? (string)\think\Session::get('__token__') : '';
+        return \app\common\behavior\CsrfGuard::tokenAccepted($submitted, $stable, $legacy);
+    }
+
     public function step1($file='')
     {
+        if (!$this->updateCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if(empty($file)){
             return $this->error(lang('param_err'));
         }
@@ -95,11 +109,14 @@ class Update extends Base
         }
         @unlink($this->_save_path.$save_file);
         echo '</textarea></div>';
-        mac_jump( url('update/step2',['jump'=>1]) ,3);
+        mac_jump( url('update/step2',['jump'=>1, '__token__' => input('__token__', '')]) ,3);
     }
 
     public function step2()
     {
+        if (!$this->updateCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $version = config('version.code');
 
         $save_file = 'database.php';
@@ -162,11 +179,14 @@ class Update extends Base
             echo lang('admin/update/no_sql')."\n";
         }
         echo '</textarea></div>';
-        mac_jump(url('update/step3', ['jump' => 1]), 3);
+        mac_jump(url('update/step3', ['jump' => 1, '__token__' => input('__token__', '')]), 3);
     }
 
     public function step3()
     {
+        if (!$this->updateCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         echo $this->fetch('admin@public/head');
         echo "<div class='update'><h1>".lang('admin/update/step3_a')."</h1><div rows=\"25\" class='layui-textarea' readonly>\n";
         ob_flush();flush();

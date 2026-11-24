@@ -37,7 +37,7 @@ foreach (['user', 'card', 'msg', 'plog'] as $table) {
 
 $upgrade = file_get_contents(APP_PATH . 'data/update/database.php');
 rt_check($upgrade !== false, '[card_tx] unable to read database upgrade script');
-rt_check(strpos($upgrade, "foreach (['card', 'msg', 'plog', 'user'] as \\$transactionTable)") !== false,
+rt_check(strpos($upgrade, "foreach (['card', 'msg', 'plog', 'user'] as " . '$transactionTable)') !== false,
     '[card_tx] legacy database upgrade must migrate card/msg/plog/user to InnoDB');
 rt_check(strpos($upgrade, '$engine_list[$fullTableName]') !== false,
     '[card_tx] upgrade must use exact table engine metadata');

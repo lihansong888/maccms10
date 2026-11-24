@@ -27,6 +27,7 @@ foreach ([
     'ImdbExternalSourceProvider' => APP_PATH . 'common/util/ImdbExternalSourceProvider.php',
     'TmdbExternalSourceProvider' => APP_PATH . 'common/util/TmdbExternalSourceProvider.php',
     'AiCatalogLinkFetcher' => APP_PATH . 'common/util/AiCatalogLinkFetcher.php',
+    'Addon store' => APP_PATH . 'common/model/Addon.php',
 ] as $provider => $file) {
     $src = (string)@file_get_contents($file);
     rt_check(strpos($src, 'HttpClient::safeGet(') !== false, "[ssrf_provider] {$provider}: outbound GET must use HttpClient::safeGet()");

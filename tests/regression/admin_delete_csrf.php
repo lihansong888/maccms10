@@ -101,6 +101,21 @@ foreach ($extraActions as $controller => $actions) {
     }
 }
 
+$cj = rt_functions(APP_PATH . 'admin/controller/Cj.php');
+foreach (['info','col_all','col_url','col_content','content_del','content_into','import'] as $action) {
+    rt_check(isset($cj[$action]), "[cj_csrf] Cj::{$action} exists");
+    if (isset($cj[$action])) {
+        $body = $cj[$action]['body'];
+        rt_check(strpos($body, 'adminCsrfOk()') !== false, "[cj_csrf] {$action} validates CSRF");
+        if ($action !== 'info') {
+            rt_check(strpos($body, 'Request()->isPost()') !== false, "[cj_csrf] {$action} requires POST");
+        }
+    }
+}
+$cjView = file_get_contents(APP_PATH . 'admin/view_new/cj/index.html');
+rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_url\')') !== false, '[cj_csrf] URL collection iframe uses POST');
+rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_content\')') !== false, '[cj_csrf] content collection iframe uses POST');
+
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");

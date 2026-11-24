@@ -117,6 +117,37 @@ rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_ur
 rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_content\')') !== false, '[cj_csrf] content collection iframe uses POST');
 rt_check(strpos($cjView, "data: {__token__: window.__MAC_ADMIN_CSRF__") !== false, '[cj_csrf] rule import upload sends CSRF token');
 
+$uploadActions = [
+    'Upload' => ['upload'],
+    'ThemeDesign' => ['upload'],
+    'Domain' => ['import'],
+];
+foreach ($uploadActions as $controller => $actions) {
+    $functions = rt_functions(APP_PATH . "admin/controller/{$controller}.php");
+    foreach ($actions as $action) {
+        rt_check(isset($functions[$action]), "[upload_csrf] {$controller}::{$action} exists");
+        if (isset($functions[$action])) {
+            $body = $functions[$action]['body'];
+            rt_check(strpos($body, 'isPost()') !== false, "[upload_csrf] {$controller}::{$action} requires POST");
+            rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[upload_csrf] {$controller}::{$action} validates CSRF");
+        }
+    }
+}
+$uploadViews = [
+    'annex/info.html','user/info.html','role/info.html','type/info.html','topic/info.html',
+    'manga/info.html','actor/info.html','vod/info.html','art/info.html','website/info.html',
+    'system/config.html','tplconfig/theme.html','addon/config.html','domain/index.html',
+    'themedesign/design.html','cj/index.html',
+];
+foreach ($uploadViews as $view) {
+    $source = file_get_contents(APP_PATH . 'admin/view_new/' . $view);
+    rt_check(strpos($source, '__token__') !== false, "[upload_csrf] {$view} sends upload token");
+}
+$addonLocalView = file_get_contents(APP_PATH . 'admin/view_new/addon/add.html');
+rt_check(strpos($addonLocalView, "__token__: function") !== false, '[upload_csrf] addon local installer sends legacy token');
+$playerImportView = file_get_contents(APP_PATH . 'admin/view_new/vodplayer/import.html');
+rt_check(strpos($playerImportView, '__token__') !== false, '[upload_csrf] player import sends legacy token');
+
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");

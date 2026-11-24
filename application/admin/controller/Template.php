@@ -216,6 +216,9 @@ class Template extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($GLOBALS['config']['app']['security_template_editor'])) {
             return $this->error('模板文件在线删除已禁用');
         }

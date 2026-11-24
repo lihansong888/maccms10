@@ -1098,8 +1098,11 @@ class User extends Base
             return json(['code' => 1002, 'msg' => lang('index/not_login')]);
         }
 
-        $csrfErr = $this->checkCsrf();
-        if ($csrfErr !== null) return json($csrfErr);
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $limited = $this->apiRateLimit('upgrade_order_create', intval($GLOBALS['user']['user_id']), 20, 60);
         if ($limited !== true) {
@@ -1279,9 +1282,17 @@ class User extends Base
      */
     public function read_notify(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         $uid = intval($check['info']['user_id']);
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
         $param = $request->post();
         $all = isset($param['all']) ? $param['all'] : '';
         if ((string)$all === '1') {
@@ -1305,9 +1316,17 @@ class User extends Base
      */
     public function del_notify(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         $uid = intval($check['info']['user_id']);
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
         $param = $request->post();
         $idsRaw = isset($param['ids']) ? htmlspecialchars(urldecode(trim($param['ids']))) : '';
         $ids = [];

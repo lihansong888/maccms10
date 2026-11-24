@@ -1467,20 +1467,30 @@ class User extends Base
             }
         }
 
-        // 原子作废验证码，防重放：仅当仍为未使用(0)时置为已使用(1)，避免并发重复重置
-        $consumed = Db::name('msg')->where(['msg_id'=>$msg_id,'msg_status'=>0])->update(['msg_status'=>1]);
-        if($consumed != 1){
-            return ['code'=>9002,'msg'=>lang('model/user/msg_not_found')];
-        }
+        // 验证码作废与密码更新必须在同一事务内，避免密码更新失败却提前消耗验证码
+        Db::startTrans();
+        try {
+            $consumed = Db::name('msg')->where(['msg_id'=>$msg_id,'msg_status'=>0])->update(['msg_status'=>1]);
+            if ($consumed != 1) {
+                Db::rollback();
+                return ['code'=>9002,'msg'=>lang('model/user/msg_not_found')];
+            }
 
-        $update = [];
-        $update['user_pwd'] = mac_hash_password_for_column($password_raw, 'user', 'user_pwd');
-        $res = $this->where($where)->update($update);
-        if($res===false){
+            $update = [];
+            $update['user_pwd'] = mac_hash_password_for_column($password_raw, 'user', 'user_pwd');
+            $res = $this->where($where)->update($update);
+            if ($res === false) {
+                Db::rollback();
+                return ['code'=>2009,'msg'=>lang('model/user/pass_reset_err')];
+            }
+
+            Db::commit();
+            Cache::rm($attemptKey);
+            return ['code'=>1,'msg'=>lang('model/user/pass_reset_ok')];
+        } catch (\\Throwable $e) {
+            Db::rollback();
             return ['code'=>2009,'msg'=>lang('model/user/pass_reset_err')];
         }
-        Cache::rm($attemptKey);
-        return ['code'=>1,'msg'=>lang('model/user/pass_reset_ok')];
     }
 
     public function visit($param)

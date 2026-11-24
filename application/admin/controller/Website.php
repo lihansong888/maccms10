@@ -199,6 +199,9 @@ class Website extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
             $param['website_content'] = str_replace( $GLOBALS['config']['upload']['protocol'].':','mac:',$param['website_content']);
             $contentLang = $param['content_lang'] ?? [];
@@ -257,6 +260,9 @@ class Website extends Base
      */
     public function contentLangTranslate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('illegal_request'));
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -275,6 +281,9 @@ class Website extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('illegal_request'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -304,6 +313,9 @@ class Website extends Base
 
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('illegal_request'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -357,6 +369,9 @@ class Website extends Base
 
     public function updateToday()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('illegal_request'));
+        }
         $param = input();
         $flag = $param['flag'];
         $res = model('Website')->updateToday($flag);

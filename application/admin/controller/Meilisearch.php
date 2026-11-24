@@ -238,7 +238,10 @@ class Meilisearch extends Base
      */
     public function sync()
     {
-        if (request()->isPost() && $this->adminCsrfOk()) {
+        if (request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return json(['code' => 0, 'msg' => lang('token_err')]);
+            }
             $r = MeilisearchSync::fullReindex();
             return json($r);
         }

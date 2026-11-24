@@ -15,7 +15,7 @@ if(empty($col_list[$pre.'manga'])){
 /*updates*/
 // 事务一致性：卡密兑换（card/user/plog）与找回密码（msg/user）必须落在 InnoDB。
 // 只在现有表不是 InnoDB 时迁移，避免每次升级都重复重建大表。
-foreach (['card', 'msg', 'plog'] as $transactionTable) {
+foreach (['card', 'msg', 'plog', 'user'] as $transactionTable) {
     $fullTableName = $pre . $transactionTable;
     if (!empty($col_list[$fullTableName])
         && isset($engine_list[$fullTableName])
@@ -89,7 +89,7 @@ if(empty($col_list[$pre.'plog'])){
     $sql .="\r";
 }
 if(empty($col_list[$pre.'cash'])){
-    $sql .= "CREATE TABLE `{$pre}cash` (  `cash_id` int(10) unsigned NOT NULL AUTO_INCREMENT,  `user_id` int(10) unsigned NOT NULL DEFAULT '0',  `cash_status` tinyint(1) unsigned NOT NULL DEFAULT '0',  `cash_points` smallint(6) unsigned NOT NULL DEFAULT '0',  `cash_money` decimal(12,2) unsigned NOT NULL DEFAULT '0.00',  `cash_bank_name` varchar(60) NOT NULL DEFAULT '',  `cash_bank_no` varchar(30) NOT NULL DEFAULT '',  `cash_payee_name` varchar(30) NOT NULL DEFAULT '',  `cash_time` int(10) unsigned NOT NULL DEFAULT '0',  `cash_time_audit` int(10) unsigned NOT NULL DEFAULT '0',  PRIMARY KEY (`cash_id`),  KEY `user_id` (`user_id`),  KEY `cash_status` (`cash_status`) USING BTREE) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;";
+    $sql .= "CREATE TABLE `{$pre}cash` (  `cash_id` int(10) unsigned NOT NULL AUTO_INCREMENT,  `user_id` int(10) unsigned NOT NULL DEFAULT '0',  `cash_status` tinyint(1) unsigned NOT NULL DEFAULT '0',  `cash_points` smallint(6) unsigned NOT NULL DEFAULT '0',  `cash_money` decimal(12,2) unsigned NOT NULL DEFAULT '0.00',  `cash_bank_name` varchar(60) NOT NULL DEFAULT '',  `cash_bank_no` varchar(30) NOT NULL DEFAULT '',  `cash_payee_name` varchar(30) NOT NULL DEFAULT '',  `cash_time` int(10) unsigned NOT NULL DEFAULT '0',  `cash_time_audit` int(10) unsigned NOT NULL DEFAULT '0',  PRIMARY KEY (`cash_id`),  KEY `user_id` (`user_id`),  KEY `cash_status` (`cash_status`) USING BTREE) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;";
     $sql .="\r";
 }
 if(empty($col_list[$pre.'mall_goods'])){

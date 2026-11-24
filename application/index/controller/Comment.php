@@ -1,10 +1,14 @@
 <?php
 namespace app\index\controller;
+
+use app\common\util\CsrfGuard;
 use think\Controller;
 use \think\Request;
 
 class Comment extends Base
 {
+    use CsrfGuard;
+
     public function __construct()
     {
         parent::__construct();
@@ -35,6 +39,11 @@ class Comment extends Base
     }
 
     public function saveData() {
+        $csrfErr = $this->checkCsrf();
+        if ($csrfErr !== null) {
+            return $csrfErr;
+        }
+
         $param = input();
 
         // 公共评论接口只接收用户可填写字段；user_id、comment_id、审核状态、IP、

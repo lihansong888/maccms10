@@ -29,6 +29,7 @@ jobs:
           php -l application/admin/controller/User.php
           php -l application/index/controller/Comment.php
           php -l application/common/model/User.php
+          php -l application/extra/maccms.php
           php -l tests/regression/ssrf_collection.php
           php -l tests/regression/card_redemption_transaction.php
           php -l tests/regression/template_path_safety.php
@@ -37,6 +38,7 @@ jobs:
           php -l tests/regression/admin_write_csrf.php
           php -l tests/regression/comment_mass_assignment.php
           php -l tests/regression/password_reset_rate_limit.php
+          php -l tests/regression/player_remote_defaults.php
       - name: Collection SSRF regression
         run: php tests/regression/ssrf_collection.php
       - name: Card redemption regression
@@ -53,3 +55,5 @@ jobs:
         run: php tests/regression/comment_mass_assignment.php
       - name: Password reset rate limit regression
         run: php tests/regression/password_reset_rate_limit.php
+      - name: Player remote defaults regression
+        run: php tests/regression/player_remote_defaults.php

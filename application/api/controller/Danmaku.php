@@ -2,10 +2,12 @@
 namespace app\api\controller;
 
 use think\Request;
+use app\common\util\CsrfGuard;
 
 class Danmaku extends Base
 {
     use PublicApi;
+    use CsrfGuard;
 
     public function __construct()
     {
@@ -85,6 +87,11 @@ class Danmaku extends Base
             if (!$user) {
                 return json(['code' => 1, 'msg' => lang('danmaku/login_required')]);
             }
+            $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+            if (!$viaBearer) {
+                $csrfErr = $this->checkCsrf();
+                if ($csrfErr !== null) return json(['code' => 1, 'msg' => $csrfErr['msg']]);
+            }
 
             $param = $request->param();
             $id = isset($param['id']) ? $param['id'] : '';
@@ -151,10 +158,16 @@ class Danmaku extends Base
      */
     public function send(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         // 检查登录
         $user = $this->_checkLoginForApi();
         if (!$user) {
             return json(['code' => 1010, 'msg' => lang('danmaku/login_required')]);
+        }
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
         }
 
         $param = $request->param();
@@ -215,6 +228,7 @@ class Danmaku extends Base
      */
     public function report(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         // 检查登录
         $user = $this->_checkLoginForApi();
         if (!$user) {

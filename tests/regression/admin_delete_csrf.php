@@ -129,10 +129,18 @@ foreach ($uploadActions as $controller => $actions) {
         if (isset($functions[$action])) {
             $body = $functions[$action]['body'];
             rt_check(strpos($body, 'isPost()') !== false, "[upload_csrf] {$controller}::{$action} requires POST");
-            rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[upload_csrf] {$controller}::{$action} validates CSRF");
+            $guard = $controller === 'Upload' ? 'uploadRequestAllowed()' : '$this->adminCsrfOk()';
+            rt_check(strpos($body, $guard) !== false, "[upload_csrf] {$controller}::{$action} validates CSRF or strict same-origin");
+
         }
     }
 }
+$uploadController = rt_functions(APP_PATH . 'admin/controller/Upload.php');
+$uploadGuard = isset($uploadController['uploadRequestAllowed']) ? $uploadController['uploadRequestAllowed']['body'] : '';
+rt_check(strpos($uploadGuard, '$this->adminCsrfOk()') !== false, '[upload_csrf] upload accepts stable CSRF token');
+rt_check(strpos($uploadGuard, "header('origin')") !== false || strpos($uploadGuard, "header('referer')") !== false, '[upload_csrf] legacy editors require same-origin headers');
+rt_check(strpos($uploadGuard, "header('sec-fetch-site')") !== false, '[upload_csrf] legacy editor fallback checks Fetch Metadata');
+
 $uploadViews = [
     'annex/info.html','user/info.html','role/info.html','type/info.html','topic/info.html',
     'manga/info.html','actor/info.html','vod/info.html','art/info.html','website/info.html',
@@ -143,6 +151,9 @@ foreach ($uploadViews as $view) {
     $source = file_get_contents(APP_PATH . 'admin/view_new/' . $view);
     rt_check(strpos($source, '__token__') !== false, "[upload_csrf] {$view} sends upload token");
 }
+$legacyUploadView = file_get_contents(APP_PATH . 'admin/view_new/upload/index.html');
+rt_check(strpos($legacyUploadView, 'name="__token__"') !== false, '[upload_csrf] legacy upload form includes CSRF token');
+
 $addonLocalView = file_get_contents(APP_PATH . 'admin/view_new/addon/add.html');
 rt_check(strpos($addonLocalView, "__token__: function") !== false, '[upload_csrf] addon local installer sends legacy token');
 $playerImportView = file_get_contents(APP_PATH . 'admin/view_new/vodplayer/import.html');

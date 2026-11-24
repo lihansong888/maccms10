@@ -211,7 +211,7 @@ layui.define(['element', 'form'], function(exports) {
 
     // 按按钮声明的 data-method 发送写请求；默认保持旧 GET 行为以兼容现有页面。
     function macAdminActionRequest(url, data, method, callback) {
-        if (String(method || 'get').toLowerCase() === 'post') {
+        if (String(method || 'post').toLowerCase() === 'post') {
             return $.post(url, data || {}, callback);
         }
         return $.get(url, data || {}, callback);

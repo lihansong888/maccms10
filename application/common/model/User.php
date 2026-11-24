@@ -1425,7 +1425,7 @@ class User extends Base
         try {
             $attempts = (int)Cache::get($key, 0);
             if ($attempts >= 5) {
-                return $attempts;
+                return 6;
             }
             $next = $attempts + 1;
             if (!Cache::set($key, $next, 600)) {
@@ -1469,7 +1469,7 @@ class User extends Base
         if ($attempts === false) {
             return ['code' => 2011, 'msg' => '验证码服务暂不可用，请稍后重试'];
         }
-        if ($attempts >= 5) {
+        if ($attempts > 5) {
             return ['code' => 2010, 'msg' => '验证码尝试次数过多，请 10 分钟后再试'];
         }
 

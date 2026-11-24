@@ -18,8 +18,9 @@ foreach ([
 ] as $file => $paths) {
     $source = file_get_contents(ROOT_PATH . $file);
     rt_check($source !== false, "[player_loading] unable to read {$file}");
+    $normalized = str_replace('\\/', '/', $source);
     foreach ($paths as $local) {
-        rt_check(strpos($source, $local) !== false, "[player_loading] {$file} missing local URL {$local}");
+        rt_check(strpos($normalized, $local) !== false, "[player_loading] {$file} missing local URL {$local}");
     }
     rt_check(strpos($source, 'union.maccms.la') === false,
         "[player_loading] {$file} must not call the remote union host");

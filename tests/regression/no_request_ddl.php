@@ -58,7 +58,7 @@ foreach (['card', 'msg', 'plog'] as $table) {
 }
 $dbUpdate = file_get_contents(APP_PATH . 'data/update/database.php');
 $adminUpdate = file_get_contents(APP_PATH . 'admin/controller/Update.php');
-rt_check(strpos($dbUpdate, "foreach (['card', 'msg', 'plog'] as $transactionTable)") !== false
+rt_check(strpos($dbUpdate, 'foreach ([\'card\', \'msg\', \'plog\'] as $transactionTable)') !== false
     && strpos($dbUpdate, 'ENGINE=InnoDB') !== false,
     '[transaction_engine] database upgrade must migrate card/msg/plog to InnoDB');
 rt_check(strpos($adminUpdate, 'information_schema.tables') !== false

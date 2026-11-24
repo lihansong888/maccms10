@@ -65,6 +65,9 @@ class Role extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('param_err'));
+            }
             $param = input('post.');
             $res = model('Role')->saveData($param);
             if($res['code']>1){
@@ -99,6 +102,9 @@ class Role extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -116,6 +122,9 @@ class Role extends Base
 
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

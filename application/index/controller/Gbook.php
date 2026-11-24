@@ -46,6 +46,9 @@ class Gbook extends Base
     }
     
     public function saveData() {
+        if (!Request()->isPost()) {
+            return ['code' => 1001, 'msg' => lang('param_err')];
+        }
         $csrfErr = $this->checkCsrf();
         if ($csrfErr !== null) {
             return $csrfErr;

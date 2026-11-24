@@ -52,6 +52,9 @@ class Topic extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('param_err'));
+            }
             $param = input('post.');
             $contentLang = $param['content_lang'] ?? [];
             unset($param['content_lang']);
@@ -106,6 +109,9 @@ class Topic extends Base
      */
     public function contentLangTranslate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -124,6 +130,9 @@ class Topic extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -141,6 +150,9 @@ class Topic extends Base
 
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

@@ -227,6 +227,22 @@ layui.define(['element', 'form'], function (exports) {
         form.render('checkbox');
     });
 
+    /* 列表状态快捷切换：使用 POST，后台执行 CSRF 校验 */
+    $(document).on('click', '.j-tr-field', function () {
+        var that = $(this), href = that.attr('data-href');
+        if (!href) {
+            layer.msg('请设置data-href参数');
+            return false;
+        }
+        $.post(href, {}, function (res) {
+            layer.msg(res.msg);
+            if (res.code == 1) {
+                location.reload();
+            }
+        }, 'json');
+        return false;
+    });
+
     /* 监听状态设置开关 */
     form.on('switch(switchStatus)', function (data) {
         var that = $(this), status = 0;

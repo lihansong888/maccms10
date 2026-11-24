@@ -46,6 +46,9 @@ class Task extends Base
     public function info()
     {
         if (request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input();
             $contentLang = $param['content_lang'] ?? [];
             unset($param['content_lang']);
@@ -121,6 +124,9 @@ class Task extends Base
     // 删除任务
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         if (!empty($ids)) {
@@ -138,6 +144,9 @@ class Task extends Base
     // 修改状态
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

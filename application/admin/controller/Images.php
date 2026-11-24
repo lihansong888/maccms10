@@ -28,19 +28,33 @@ class Images extends Base
             return $this->error(lang('token_err'));
         }
         $param = input();
-        $fname = $param['ids'];
-        if(!empty($fname)){
-            foreach($fname as $a){
-                $a = str_replace('\\','/',$a);
-
-                if( (substr($a,0,8) != "./upload") || count( explode("./",$a) ) > 2) {
-
-                }
-                else{
-                    $a = mac_convert_encoding($a,"UTF-8","GB2312");
-                    if(file_exists($a)){ @unlink($a); }
-                }
+        $fname = isset($param['ids']) ? $param['ids'] : [];
+        if (!is_array($fname)) {
+            $fname = [$fname];
+        }
+        $uploadRoot = realpath(ROOT_PATH . 'upload');
+        if ($uploadRoot === false) {
+            return $this->error(lang('param_err'));
+        }
+        $prefix = rtrim($uploadRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        foreach ($fname as $a) {
+            if (!is_string($a) || $a === '') {
+                continue;
             }
+            $a = str_replace('\\', '/', $a);
+            $a = mac_convert_encoding($a, "UTF-8", "GB2312");
+            if (strpos($a, './upload/') !== 0) {
+                continue;
+            }
+            $target = realpath(ROOT_PATH . substr($a, 2));
+            if ($target === false || !is_file($target)) {
+                continue;
+            }
+            // realpath 后校验目录边界，阻止 ../ 与指向 upload 目录外的符号链接。
+            if (strpos($target, $prefix) !== 0) {
+                continue;
+            }
+            @unlink($target);
         }
         return $this->success(lang('del_ok'));
     }

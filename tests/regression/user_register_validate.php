@@ -34,7 +34,8 @@ function assert_same($expected, $actual, $message)
 
 function extract_method_body($source, $method)
 {
-    $needle = 'public function ' . $method . '(';
+    // 支持 public/protected/private 方法。
+    $needle = 'function ' . $method . '(';
     $start = strpos($source, $needle);
     if ($start === false) {
         return false;

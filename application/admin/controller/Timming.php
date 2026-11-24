@@ -53,6 +53,9 @@ class Timming extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $list = config('timming');
         unset($list[$param['ids']]);

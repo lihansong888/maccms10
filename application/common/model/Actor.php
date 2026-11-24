@@ -310,8 +310,8 @@ class Actor extends Base {
             $order = ['[rand]' => '[rand]'];
         } elseif ($by == 'in' && !empty($name)) {
             // name 可由分页 URL 参数覆盖，进入 orderRaw 前必须作为 SQL 字符串字面量转义
-            $safeOrderName = str_replace(["\\\\", "'"], ["\\\\\\\\", "''"], (string)$name);
-            $order = ' find_in_set(actor_name, \\' . $safeOrderName . \\'  ) ';
+            $safeOrderName = str_replace(["\\", "'"], ["\\\\", "''"], (string)$name);
+            $order = " find_in_set(actor_name, '" . $safeOrderName . "' ) ";
         } else {
             if ($by == 'in' && empty($name)) {
                 $by = 'time';

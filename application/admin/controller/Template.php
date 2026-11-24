@@ -67,10 +67,19 @@ class Template extends Base
             $path = '.@template';
         }
 
-        if(substr($path,0,10) != ".@template") { $path = ".@template"; }
-        if(count( explode(".@",$path) ) > 2) {
-            $this->error(lang('illegal_request'));
-            return;
+        if (substr($path, 0, 10) !== ".@template") {
+            $path = ".@template";
+        }
+        // 目录层级只允许 template 根目录下的普通名称，拒绝 ..、空段和伪造路径。
+        $relativeParts = substr($path, 10);
+        if ($relativeParts !== '') {
+            $relativeParts = explode('@', ltrim($relativeParts, '@'));
+            foreach ($relativeParts as $part) {
+                if ($part === '' || $part === '.' || $part === '..') {
+                    $path = ".@template";
+                    break;
+                }
+            }
         }
 
         $uppath = substr($path,0,strrpos($path,"@"));
@@ -101,6 +110,20 @@ class Template extends Base
         else{
             $pp = str_replace('@','/',$path);
             $filters = $pp.'/*';
+        }
+
+        // 真实路径校验：即使配置/请求中的 @ 分隔路径包含符号链接或目录穿越，
+        // 模板管理器也只能枚举 template 根目录以内的真实目录。
+        $templateRoot = realpath(ROOT_PATH . 'template');
+        $realDirectory = realpath(ROOT_PATH . substr($pp, 2));
+        $templatePrefix = $templateRoot === false ? '' : rtrim($templateRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if ($templateRoot === false || $realDirectory === false || !is_dir($realDirectory)
+            || ($realDirectory !== $templateRoot && strpos($realDirectory, $templatePrefix) !== 0)) {
+            $path = '.@template';
+            $uppath = '';
+            $ischild = 0;
+            $pp = './template';
+            $filters = $pp . '/*';
         }
 
         $this->assign('curpath',$path);

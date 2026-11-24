@@ -371,13 +371,15 @@ layui.define(['element', 'form'], function (exports) {
                 layer.msg('请设置data-href参数');
                 return false;
             }
-            $.get(href, function (res) {
+            var method = (that.attr('data-method') || 'GET').toUpperCase();
+            var request = method === 'POST' ? $.post : $.get;
+            request(href, {}, function (res) {
                 layer.msg(res.msg);
                 if (res.code == 1) {
                     that.parents('tr').remove();
                     that.parents('.tr').remove();
                 }
-            });
+            }, 'json');
             layer.close(index);
         });
         return false;
@@ -393,9 +395,11 @@ layui.define(['element', 'form'], function (exports) {
             return false;
         }
 
+        var method = (that.attr('data-method') || 'GET').toUpperCase();
+        var request = method === 'POST' ? $.post : $.get;
         if (!that.attr('confirm')) {
             layer.msg('数据提交中...', { time: 500000 });
-            $.get(href, {}, function (res) {
+            request(href, {}, function (res) {
                 layer.msg(res.msg, {}, function () {
                     if (refresh == 'yes') {
                         if (typeof (res.url) != 'undefined' && res.url != null && res.url != '') {
@@ -404,14 +408,14 @@ layui.define(['element', 'form'], function (exports) {
                             location.reload();
                         }
                     }
-                });
+                }, 'json');
             });
             layer.close();
         }
         else {
             layer.confirm(that.attr('confirm'), { title: false, closeBtn: 0 }, function (index) {
                 layer.msg('数据提交中...', { time: 500000 });
-                $.get(href, {}, function (res) {
+                request(href, {}, function (res) {
                     layer.msg(res.msg, {}, function () {
                         if (refresh == 'yes') {
                             if (typeof (res.url) != 'undefined' && res.url != null && res.url != '') {
@@ -420,7 +424,7 @@ layui.define(['element', 'form'], function (exports) {
                                 location.reload();
                             }
                         }
-                    });
+                    }, 'json');
                 });
                 layer.close(index);
             });

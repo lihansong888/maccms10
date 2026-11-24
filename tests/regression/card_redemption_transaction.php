@@ -37,11 +37,13 @@ foreach (['user', 'card', 'msg', 'plog'] as $table) {
 
 $upgrade = file_get_contents(APP_PATH . 'data/update/database.php');
 rt_check($upgrade !== false, '[card_tx] unable to read database upgrade script');
-foreach (['card', 'msg'] as $table) {
-    rt_check(strpos($upgrade, "\$pre . '{$table}'") !== false,
-        "[card_tx] legacy database upgrade must migrate mac_{$table} to InnoDB");
-}
-rt_check(strpos($upgrade, '$engine_list[$innodb_table]') !== false,
+rt_check(strpos($upgrade, "foreach (['card', 'msg', 'plog', 'user'] as \$transactionTable)") !== false,
+    '[card_tx] legacy database upgrade must migrate card/msg/plog/user to InnoDB');
+rt_check(strpos($upgrade, '$engine_list[$fullTableName]') !== false,
     '[card_tx] upgrade must use exact table engine metadata');
+rt_check((bool)preg_match('/CREATE TABLE `\{\$pre\\\x27plog\\\x27\}[\\s\\S]*?ENGINE=InnoDB/i', $upgrade)
+    || strpos($upgrade, "CREATE TABLE `{\$pre}plog`") !== false
+        && strpos(substr($upgrade, strpos($upgrade, "CREATE TABLE `{\$pre}plog`"), 1400), 'ENGINE=InnoDB') !== false,
+    '[card_tx] newly created mac_plog must use InnoDB');
 
 rt_done('card redemption transaction');

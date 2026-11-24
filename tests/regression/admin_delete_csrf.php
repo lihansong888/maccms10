@@ -102,7 +102,7 @@ foreach ($extraActions as $controller => $actions) {
 }
 
 $cj = rt_functions(APP_PATH . 'admin/controller/Cj.php');
-foreach (['info','col_all','col_url','col_content','content_del','content_into','import'] as $action) {
+foreach (['info','program','col_all','col_url','col_content','content_del','content_into','import'] as $action) {
     rt_check(isset($cj[$action]), "[cj_csrf] Cj::{$action} exists");
     if (isset($cj[$action])) {
         $body = $cj[$action]['body'];

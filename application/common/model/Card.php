@@ -161,7 +161,7 @@ class Card extends Base {
                 if (intval($info['card_points']) > 0) {
                     $res = model('User')->where(['user_id' => $user_id])->setInc('user_points', $info['card_points']);
                     if ($res === false) {
-                        throw new \\RuntimeException('CARD_POINTS_UPDATE_FAILED');
+                        throw new \RuntimeException('CARD_POINTS_UPDATE_FAILED');
                     }
                 }
 
@@ -172,12 +172,12 @@ class Card extends Base {
                 $data['plog_points'] = $info['card_points'];
                 $result = model('Plog')->saveData($data);
                 if (!is_array($result) || intval($result['code']) !== 1) {
-                    throw new \\RuntimeException('CARD_POINT_LOG_FAILED');
+                    throw new \RuntimeException('CARD_POINT_LOG_FAILED');
                 }
 
                 return ['code' => 1, 'msg' => lang('model/card/used_card_ok', [$info['card_points']])];
             });
-        } catch (\\Exception $e) {
+        } catch (\Exception $e) {
             return ['code' => 1004, 'msg' => lang('model/card/update_card_status_err')];
         }
     }

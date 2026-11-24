@@ -22,7 +22,7 @@
         </div>
         <div class="flex gap-5">
             <a data-href="{:url('log_del')}" class="layui-btn layui-btn-primary j-page-btns confirm"><i class="layui-icon">&#xe640;</i>{:lang('del')}</a>
-            <a data-href="{:url('log_del')}?all=1" class="layui-btn layui-btn-primary j-ajax" confirm="{:lang('task/clear_log_confirm')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
+            <a data-href="{:url('log_del')}?all=1" class="layui-btn layui-btn-primary j-ajax" data-method="post" confirm="{:lang('task/clear_log_confirm')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
         </div>
     </div>
     <form class="layui-form" method="post" id="pageListForm">

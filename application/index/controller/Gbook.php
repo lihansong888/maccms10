@@ -1,8 +1,12 @@
 <?php
 namespace app\index\controller;
 
+use app\common\util\CsrfGuard;
+
 class Gbook extends Base
 {
+    use CsrfGuard;
+
     var $_config;
     public function __construct()
     {
@@ -42,6 +46,11 @@ class Gbook extends Base
     }
     
     public function saveData() {
+        $csrfErr = $this->checkCsrf();
+        if ($csrfErr !== null) {
+            return $csrfErr;
+        }
+
         $param = input();
         // 留言接口只接受正文、访客显示名和验证码；身份、回复、审核、计数等字段由服务器生成。
         $param = array_intersect_key($param, array_flip(['gbook_content', 'gbook_name', 'verify']));

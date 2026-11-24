@@ -85,6 +85,9 @@ class Cj extends Base
         }
 
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $program_config = [];
             foreach($param['model_field'] as $k=>$v){
                 if(!empty($param['node_field'][$k])){

@@ -107,7 +107,7 @@
                 <td>
                     <a class="layui-badge-rim j-iframe" data-href="{:url('info?id='.$vo['user_id'])}"
                         href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['user_id'])}"
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['user_id'])}"
                         href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>

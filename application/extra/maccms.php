@@ -579,7 +579,7 @@ return array (
     'widthpop' => '0',
     'heightpop' => '600',
     'second' => '5',
-    'prestrain' => '//union.maccms.la/html/prestrain.html',
+    'prestrain' => '/static_new/player/prestrain.html',
     'buffer' => '//union.maccms.la/html/buffer.html',
     'parse' => '',
     'autofull' => '0',

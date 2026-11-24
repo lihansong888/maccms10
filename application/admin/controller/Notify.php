@@ -149,6 +149,9 @@ class Notify extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         if (empty($param['id']) || !isset($param['col']) || !isset($param['val'])) {
             return $this->error(lang('param_err'));

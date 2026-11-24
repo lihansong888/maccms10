@@ -82,7 +82,7 @@ class DoubanExternalSourceProvider implements ExternalSourceProviderInterface
             'Referer: '.trim((string)$this->get('referer', 'https://movie.douban.com/')),
             'User-Agent: '.trim((string)$this->get('user_agent', 'Mozilla/5.0')),
         ];
-        $resp = HttpClient::curlPostWithTimeout($url, '', $headers, 12, false, true);
+        $resp = HttpClient::safeGet($url, 12, true, 3, $headers);
         if ($resp === false || $resp === '') {
             return [];
         }

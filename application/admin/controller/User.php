@@ -299,6 +299,9 @@ class User extends Base
 
     public function generateInviteCode()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $count = 0;
         $model = model('User');
         

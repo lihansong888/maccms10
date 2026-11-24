@@ -119,6 +119,8 @@ rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_co
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");
+    rt_check(strpos($js, "postForm.submit()") !== false, "[iframe_csrf] {$path} supports POST iframe forms");
+    rt_check(strpos($js, "window.__MAC_ADMIN_CSRF__") !== false, "[iframe_csrf] {$path} sends the stable admin token");
 }
 
 rt_done('admin delete CSRF coverage');

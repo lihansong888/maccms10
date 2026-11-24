@@ -187,7 +187,7 @@ foreach ([
         "[forced_csrf_ui] {$view}: row delete must submit POST");
 }
 $meiliView = (string)@file_get_contents(APP_PATH . 'admin/view_new/meilisearch/index.html');
-rt_check(strpos($meiliView, "input[name=\\"__token__\\"]") !== false,
+rt_check(strpos($meiliView, 'input[name="__token__"]') !== false,
     '[forced_csrf_ui] Meilisearch setup must submit the page CSRF token');
 $meiliSyncView = (string)@file_get_contents(APP_PATH . 'admin/view_new/meilisearch/sync.html');
 rt_check(strpos($meiliSyncView, 'mac_admin_csrf_token()') !== false,

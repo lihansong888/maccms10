@@ -106,23 +106,30 @@ class Gbook extends Base
      */
     public function submit(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $content = trim($request->param('gbook_content', ''));
         if (empty($content)) return json(['code' => 1004, 'msg' => lang('index/require_content')]);
         $cookie = 'gbook_timespan';
         if (!empty(cookie($cookie))) return json(['code' => 1005, 'msg' => lang('frequently')]);
-        if ($GLOBALS['config']['gbook']['login'] == 1) {
-            $check = model('User')->checkLogin();
-            if ($check['code'] > 1) return json(['code' => 1003, 'msg' => lang('index/require_login')]);
+        // 始终验证登录身份，绝不直接信任可伪造的 user_id Cookie。
+        $authUser = null;
+        $authResult = model('User')->checkLogin();
+        if (isset($authResult['code']) && intval($authResult['code']) === 1 && !empty($authResult['info'])) {
+            $authUser = $authResult['info'];
+        }
+        if ($GLOBALS['config']['gbook']['login'] == 1 && empty($authUser)) {
+            return json(['code' => 1003, 'msg' => lang('index/require_login')]);
         }
         $data = [];
         $data['gbook_content'] = htmlentities(mac_filter_words($content));
         $data['gbook_reply'] = '';
         $data['gbook_ip'] = mac_get_client_ip();
         $data['gbook_time'] = time();
-        if (!empty(cookie('user_id'))) {
-            $uinfo = model('User')->field('user_nick_name,user_name')->where(['user_id' => intval(cookie('user_id'))])->find();
-            $data['user_id'] = intval(cookie('user_id'));
-            $data['gbook_name'] = htmlentities($uinfo['user_nick_name'] ?: $uinfo['user_name']);
+        if (!empty($authUser)) {
+            $data['user_id'] = intval($authUser['user_id']);
+            $data['gbook_name'] = htmlentities(!empty($authUser['user_nick_name']) ? $authUser['user_nick_name'] : $authUser['user_name']);
         } else {
             $data['user_id'] = 0;
             $name = trim($request->param('gbook_name', ''));

@@ -9,7 +9,7 @@ require __DIR__ . '/lib/bootstrap.php';
 
 // ─── 列 forced_csrf：以下写接口必须在入口调用 $this->adminCsrfOk() ───
 $forced = [
-    'Admin'         => ['del', 'field'],
+    'Admin'         => ['info', 'del', 'field'],
     'Card'          => ['del', 'info'],
     'Collect'       => ['test', 'info', 'del', 'healthtoggle'],
     'Coupon'        => ['save', 'del', 'field'],
@@ -33,7 +33,6 @@ $forced = [
     'UserPm'        => ['del', 'field'],
     'Cj'            => ['info', 'del', 'import', 'program'],
     'Actor'          => ['info', 'del', 'field', 'contentLangTranslate'],
-    'Admin'          => ['info'],
     'Annex'          => ['info', 'del'],
     'Art'            => ['info'],
     'BatchPlayer'    => ['batchStatus', 'batchSort', 'batchParse', 'batchDel', 'replaceFrom'],

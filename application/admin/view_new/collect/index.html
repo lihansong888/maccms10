@@ -75,7 +75,7 @@
                     {else/}
                     <a class="layui-badge-rim j-health-toggle" href="javascript:;" data-url="{$vo.collect_url|mac_filter_xss}" data-name="{$vo.collect_name|mac_filter_xss}" data-source="custom" data-status="0" style="color:#ff5722">{:lang('admin/collect_health/btn_disable')}</a>
                     {/if}
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['collect_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['collect_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

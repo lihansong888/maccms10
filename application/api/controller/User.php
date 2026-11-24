@@ -551,9 +551,17 @@ class User extends Base
      */
     public function update_info(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         $uid = intval($check['info']['user_id']);
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
         $param = $request->param();
         $update = [];
         if (!empty($param['user_nick_name'])) $update['user_nick_name'] = htmlspecialchars(trim($param['user_nick_name']));
@@ -728,9 +736,17 @@ class User extends Base
      */
     public function del_ulog(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         $uid = intval($check['info']['user_id']);
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
         $param = $request->param();
         // 清空某类日志：all=1 且 type=1..6（与 index user/ulog_del 一致）
         if (!empty($param['all']) && (string)$param['all'] === '1') {
@@ -803,9 +819,17 @@ class User extends Base
      */
     public function del_plog(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         $uid = intval($check['info']['user_id']);
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
         $param = $request->post();
         $idsRaw = isset($param['ids']) ? htmlspecialchars(urldecode(trim($param['ids']))) : '';
         $all = isset($param['all']) ? $param['all'] : '';

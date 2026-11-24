@@ -89,6 +89,9 @@ class Collect extends Base
 
     public function test()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('illegal_request'));
+        }
         $param = input();
         $res = model('Collect')->vod($param);
         return json($res);
@@ -97,6 +100,9 @@ class Collect extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->ajaxErrorWithFreshToken(lang('token_err'));
+            }
             $param = input('post.');
             $validate = \think\Loader::validate('Token');
             if(!$validate->check($param)){

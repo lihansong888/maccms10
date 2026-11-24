@@ -42,6 +42,9 @@ jobs:
       - name: Regression test collection SSRF protection
         run: php tests/regression/collect_probe_safety.php
 
+      - name: Regression test upload path safety
+        run: php tests/regression/upload_path_safety.php
+
       - name: Regression test API list limits
         run: php tests/regression/api_num_clamp.php
 

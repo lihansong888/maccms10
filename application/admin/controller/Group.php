@@ -37,6 +37,9 @@ class Group extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
 
             // VIP 活动价时段：datetime-local 输入(_input) 转 unix 时间戳存库
@@ -87,6 +90,9 @@ class Group extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -109,6 +115,9 @@ class Group extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

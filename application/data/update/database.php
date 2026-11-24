@@ -13,6 +13,18 @@ if(empty($col_list[$pre.'manga'])){
     $sql .="\r";
 }
 /*updates*/
+// 事务一致性：卡密兑换（card/user/plog）与找回密码（msg/user）必须落在 InnoDB。
+// 只在现有表不是 InnoDB 时迁移，避免每次升级都重复重建大表。
+foreach (['card', 'msg', 'plog'] as $transactionTable) {
+    $fullTableName = $pre . $transactionTable;
+    if (!empty($col_list[$fullTableName])
+        && isset($engine_list[$fullTableName])
+        && strcasecmp((string)$engine_list[$fullTableName], 'InnoDB') !== 0) {
+        $sql .= "ALTER TABLE `{$fullTableName}` ENGINE=InnoDB;";
+        $sql .= "\r";
+    }
+}
+
 if(empty($col_list[$pre.'art']['art_pic_screenshot'])){
     $sql .= "ALTER TABLE `{$pre}art` ADD `art_pic_screenshot`  text;";
     $sql .="\r";

@@ -90,7 +90,7 @@
         b.addEventListener('click', function () {
             layer.confirm("{:lang('del_confirm')}", function (idx) {
                 layer.close(idx);
-                fetch(DEL_URL + '?id=' + b.getAttribute('data-id'), {credentials: 'same-origin'})
+                fetch(DEL_URL + '?id=' + b.getAttribute('data-id'), {method: 'POST', credentials: 'same-origin'})
                     .then(function (r) { return r.json(); })
                     .then(function (res) { layer.msg(res.msg); if (res.code === 1) { location.reload(); } });
             });

@@ -545,6 +545,9 @@ class Vod extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
             if (intval($param['vod_status'] ?? 0) === VodAuditService::STATUS_REJECTED) {
                 $remarkErr = VodAuditService::rejectRemarkError($param['vod_audit_remark'] ?? '');
@@ -776,6 +779,9 @@ class Vod extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $purge = !empty($param['purge']);
@@ -829,6 +835,9 @@ class Vod extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -934,6 +943,9 @@ class Vod extends Base
      */
     public function audit()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         $status = intval($param['status'] ?? -1);

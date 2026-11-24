@@ -44,6 +44,9 @@ class Cash extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $all = $param['all'];
@@ -64,6 +67,9 @@ class Cash extends Base
 
     public function audit()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         if(!empty($ids)){

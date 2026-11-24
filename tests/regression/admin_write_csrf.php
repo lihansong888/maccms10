@@ -52,6 +52,7 @@ $forced = [
     'Topic'          => ['info', 'del', 'field', 'contentLangTranslate'],
     'Ulog'           => ['del'],
     'User'           => ['info', 'del', 'field', 'generateInviteCode'],
+    'Upload'         => ['upload'],
     'Visit'          => ['del'],
     'Website'        => ['info', 'contentLangTranslate', 'del', 'field', 'updateToday'],
     'ContentQuality' => ['markRecommend'],

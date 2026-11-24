@@ -4,6 +4,7 @@
  */
 require __DIR__ . '/lib/bootstrap.php';
 
+// Both shipped static trees contain local copies, so the selected player asset tree never needs a remote loading host.
 $defaults = file_get_contents(APP_PATH . 'extra/maccms.php');
 rt_check($defaults !== false, '[player_loading] unable to read player defaults');
 rt_check(strpos($defaults, "'prestrain' => '/static_new/player/prestrain.html'") !== false,

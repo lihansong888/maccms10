@@ -3,6 +3,7 @@ namespace app\common\model;
 
 use app\common\util\JwtService;
 use think\Db;
+use think\Cache;
 use think\View;
 use app\common\validate\User as UserValidate;
 
@@ -1423,8 +1424,22 @@ class User extends Base
 
         $param['type'] = 2;
         $param['to']   = $to_src;
+
+        // 按找回渠道和收件地址限速，避免六位验证码被反复猜测；计数只记录验证码不匹配。
+        $rateKey = 'maccms_findpass_fail_' . md5(strtolower((string)$param['ac'] . '|' . $to_src));
+        $failedAttempts = intval(Cache::get($rateKey, 0));
+        if ($failedAttempts >= 20) {
+            return ['code' => 2010, 'msg' => lang('frequently')];
+        }
+
         $res = $this->check_msg($param);
         if($res['code'] >1){
+            if (intval($res['code']) === 9002) {
+                $failedAttempts = Cache::inc($rateKey);
+                if ($failedAttempts === 1) {
+                    Cache::set($rateKey, 1, 900);
+                }
+            }
             return ['code'=>$res['code'],'msg'=>$res['msg']];
         }
         $msg_id = $res['msg_id'];
@@ -1469,6 +1484,7 @@ class User extends Base
         if($res===false){
             return ['code'=>2009,'msg'=>lang('model/user/pass_reset_err')];
         }
+        Cache::rm($rateKey);
         return ['code'=>1,'msg'=>lang('model/user/pass_reset_ok')];
     }
 

@@ -53,3 +53,6 @@ jobs:
 
       - name: Regression test card redemption transactions
         run: php tests/regression/card_redemption_transaction.php
+
+      - name: Regression test local player loading pages
+        run: php tests/regression/player_loading_local.php

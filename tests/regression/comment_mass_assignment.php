@@ -15,7 +15,8 @@ foreach (['user_id', 'comment_id', 'comment_status', 'comment_ip', 'comment_up',
         "untrusted {$field} is not allowlisted");
 }
 rt_check(strpos($body, "\$param['user_id'] = 0;") !== false, 'guest identity is forced to user id zero');
-rt_check(strpos($body, "\$param['user_id'] = intval(cookie('user_id'));") !== false, 'logged-in identity comes from authenticated cookie');
+rt_check(strpos($body, "model('User')->checkLogin()") !== false, 'logged-in identity is validated by User::checkLogin');
+rt_check(strpos($body, "\$authUser['user_id']") !== false, 'logged-in identity uses verified user id');
 rt_check(strpos($body, "unset(\$param['comment_id'])") === false, 'comment edit id is excluded by allowlist');
 
 $indexComment = rt_functions(APP_PATH . 'index/controller/Comment.php');
@@ -29,7 +30,7 @@ $guestbookBody = isset($guestbook['saveData']) ? $guestbook['saveData']['body'] 
 rt_check(strpos($guestbookBody, 'array_flip([\'gbook_content\', \'gbook_name\', \'verify\'])') !== false, 'site guestbook uses an explicit input allowlist');
 rt_check(strpos($guestbookBody, 'model(\'User\')->checkLogin()') !== false, 'site guestbook identity comes from verified login');
 rt_check(strpos($guestbookBody, '$authUser[\'user_id\']') !== false, 'site guestbook uses verified user id');
-rt_check(strpos($guestbookBody, "'gbook_status'] = ($GLOBALS['config']['gbook']['audit'] == 1) ? 0 : 1") !== false, 'guestbook status is always server-controlled');
+rt_check(strpos($guestbookBody, "'gbook_status'] = (\$GLOBALS['config']['gbook']['audit'] == 1) ? 0 : 1") !== false, 'guestbook status is always server-controlled');
 
 $apiComment = rt_functions(APP_PATH . 'api/controller/Comment.php');
 $apiCommentBody = isset($apiComment['submit']) ? $apiComment['submit']['body'] : '';

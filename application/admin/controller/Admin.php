@@ -41,6 +41,9 @@ class Admin extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->ajaxErrorWithFreshToken(lang('token_err'));
+            }
             $param = input('post.');
             if(!in_array('index/welcome',$param['admin_auth'])){
                 $param['admin_auth'][] = 'index/welcome';

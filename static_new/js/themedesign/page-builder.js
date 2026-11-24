@@ -3696,6 +3696,7 @@
                 elem: elem,
                 url: PB.urls.upload || '',
                 method: 'post',
+                headers: { 'X-CSRF-Token': (window.__MAC_ADMIN_CSRF__ || '') },
                 accept: 'images',
                 before: function () {
                     layui.layer.msg(PB.lang.uploading || 'Uploading…', { time: 30000 });
@@ -4407,6 +4408,7 @@
                     elem: '#pbFooterLogoUpload',
                     url: PB.urls.upload || '',
                     method: 'post',
+                headers: { 'X-CSRF-Token': (window.__MAC_ADMIN_CSRF__ || '') },
                     field: 'file',
                     data: { theme: PB.theme },
                     before: function () {
@@ -4490,6 +4492,7 @@
                     elem: '#pbDecorUpload',
                     url: PB.urls.upload || '',
                     method: 'post',
+                headers: { 'X-CSRF-Token': (window.__MAC_ADMIN_CSRF__ || '') },
                     field: 'file',
                     data: { theme: PB.theme },
                     before: function () {
@@ -4563,6 +4566,7 @@
                     elem: '#pbLogoUpload',
                     url: PB.urls.upload || '',
                     method: 'post',
+                headers: { 'X-CSRF-Token': (window.__MAC_ADMIN_CSRF__ || '') },
                     field: 'file',
                     data: { theme: PB.theme },
                     before: function () {

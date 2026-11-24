@@ -184,6 +184,9 @@ class Index extends Base
 
     public function clear()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $res = $this->_cache_clear();
         //运行缓存
         if (!$res) {

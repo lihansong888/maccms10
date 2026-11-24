@@ -162,8 +162,17 @@ class Cash extends Base
      */
     public function del(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $auth = $this->_checkLogin();
         if (!$auth['ok']) return $auth['response'];
+
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $param = $request->param();
 

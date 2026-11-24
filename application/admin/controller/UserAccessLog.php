@@ -157,6 +157,9 @@ class UserAccessLog extends Base
      */
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (!request()->isPost()) {
             return $this->error(lang('illegal_request'));
         }

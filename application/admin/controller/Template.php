@@ -9,10 +9,57 @@ class Template extends Base
         parent::__construct();
     }
 
+    /**
+     * 将模板文件路径限制在真实 template 目录内，防止 ../ 与符号链接逃逸。
+     * $allowMissing 仅允许目标文件不存在、但父目录必须真实存在的情况（编辑器首次保存）。
+     */
+    private function resolveTemplateFilePath($path, $allowMissing = false)
+    {
+        $path = str_replace('\\', '/', (string)$path);
+        if (strpos($path, './template/') !== 0) {
+            return false;
+        }
+
+        $relative = substr($path, 2);
+        $segments = explode('/', $relative);
+        foreach ($segments as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+
+        $root = realpath(ROOT_PATH . 'template');
+        if ($root === false) {
+            return false;
+        }
+
+        $candidate = ROOT_PATH . $relative;
+        $real = realpath($candidate);
+        if ($real === false) {
+            if (!$allowMissing) {
+                return false;
+            }
+            $parent = realpath(dirname($candidate));
+            if ($parent === false || !is_dir($parent)) {
+                return false;
+            }
+            $real = $parent . DIRECTORY_SEPARATOR . basename($candidate);
+        } elseif (!is_file($real)) {
+            return false;
+        }
+
+        $prefix = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (strpos($real, $prefix) !== 0) {
+            return false;
+        }
+
+        return $real;
+    }
+
     public function index()
     {
         $param = input();
-        $path = $param['path'];
+        $path = isset($param['path']) && is_string($param['path']) ? $param['path'] : '';
         $path = str_replace('\\','',$path);
         $path = str_replace('/','',$path);
 
@@ -20,10 +67,19 @@ class Template extends Base
             $path = '.@template';
         }
 
-        if(substr($path,0,10) != ".@template") { $path = ".@template"; }
-        if(count( explode(".@",$path) ) > 2) {
-            $this->error(lang('illegal_request'));
-            return;
+        if (substr($path, 0, 10) !== ".@template") {
+            $path = ".@template";
+        }
+        // 目录层级只允许 template 根目录下的普通名称，拒绝 ..、空段和伪造路径。
+        $relativeParts = substr($path, 10);
+        if ($relativeParts !== '') {
+            $relativeParts = explode('@', ltrim($relativeParts, '@'));
+            foreach ($relativeParts as $part) {
+                if ($part === '' || $part === '.' || $part === '..') {
+                    $path = ".@template";
+                    break;
+                }
+            }
         }
 
         $uppath = substr($path,0,strrpos($path,"@"));
@@ -54,6 +110,20 @@ class Template extends Base
         else{
             $pp = str_replace('@','/',$path);
             $filters = $pp.'/*';
+        }
+
+        // 真实路径校验：即使配置/请求中的 @ 分隔路径包含符号链接或目录穿越，
+        // 模板管理器也只能枚举 template 根目录以内的真实目录。
+        $templateRoot = realpath(ROOT_PATH . 'template');
+        $realDirectory = realpath(ROOT_PATH . substr($pp, 2));
+        $templatePrefix = $templateRoot === false ? '' : rtrim($templateRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if ($templateRoot === false || $realDirectory === false || !is_dir($realDirectory)
+            || ($realDirectory !== $templateRoot && strpos($realDirectory, $templatePrefix) !== 0)) {
+            $path = '.@template';
+            $uppath = '';
+            $ischild = 0;
+            $pp = './template';
+            $filters = $pp . '/*';
         }
 
         $this->assign('curpath',$path);
@@ -150,28 +220,29 @@ class Template extends Base
     {
         $param = input();
 
-        $fname = $param['fname'];
-        $fpath = $param['fpath'];
+        $fname = isset($param['fname']) ? (string)$param['fname'] : '';
+        $fpath = isset($param['fpath']) ? (string)$param['fpath'] : '';
 
-        if( empty($fpath)){
+        if ($fpath === '' || $fname === '' || strpos($fname, '/') !== false || strpos($fname, '\\') !== false) {
             $this->error(lang('param_err').'1');
             return;
         }
-        $fpath = str_replace('@','/',$fpath);
-        $fullname = $fpath .'/' .$fname;
-        $fullname = str_replace('\\','/',$fullname);
-
-        if( (substr($fullname,0,10) != "./template") || count( explode("./",$fullname) ) > 2) {
+        $fpath = str_replace('@', '/', $fpath);
+        $fpath = str_replace('\\', '/', $fpath);
+        $fullname = rtrim($fpath, '/') . '/' . $fname;
+        $fullname = str_replace('\\', '/', $fullname);
+        $fullname = $this->resolveTemplateFilePath($fullname, true);
+        if ($fullname === false) {
             $this->error(lang('param_err').'2');
             return;
         }
+
         $path = pathinfo($fullname);
-        if(!empty($fname)) {
-            $extarr = array('html', 'htm', 'js', 'xml');
-            if (!in_array($path['extension'], $extarr)) {
-                $this->error(lang('admin/template/ext_safe_tip'));
-                return;
-            }
+        $extarr = array('html', 'htm', 'js', 'xml');
+        $extension = isset($path['extension']) ? strtolower($path['extension']) : '';
+        if (!in_array($extension, $extarr, true)) {
+            $this->error(lang('admin/template/ext_safe_tip'));
+            return;
         }
 
         $filter = '<\?|php|eval|server|assert|get|post|request|cookie|session|input|env|config|call|global|dump|print|phpinfo|fputs|fopen|global|chr|strtr|pack|system|gzuncompress|shell|base64|file|proc|preg|call|ini|exec\s*\(|passthru\s*\(|popen\s*\(|show_source\s*\(|create_function\s*\(|register_shutdown_function\s*\(|register_tick_function\s*\(|error_log\s*\(|{:|{$|{~|{-|{+|{/';
@@ -188,13 +259,24 @@ class Template extends Base
                 return $this->ajaxErrorWithFreshToken($validate->getError());
             }
 
-            $fcontent = $param['fcontent'];
+            $fcontent = isset($param['fcontent']) && is_string($param['fcontent']) ? $param['fcontent'] : '';
+            // ThinkPHP 标签允许 value/condition 等属性以冒号开头执行原始 PHP 表达式；
+            // 黑名单无法阻止 'sy'.'stem' 这类字符串拼接绕过，编辑器因此禁止标签属性中的直接表达式。
+            if (preg_match("/\\{[a-z][^}]*=\\s*([\"'])\\s*:/is", $fcontent)) {
+                $this->error(lang('admin/template/php_safe_tip'));
+                return;
+            }
             $r = mac_reg_replace($fcontent,$filter,"*");
             if($fcontent !== $r){
                 $this->error(lang('admin/template/php_safe_tip'));
                 return;
             }
-            $res = @fwrite(fopen($fullname,'wb'),$fcontent);
+            $handle = @fopen($fullname, 'wb');
+            if ($handle === false) {
+                return $this->ajaxErrorWithFreshToken(lang('save_err'));
+            }
+            $res = fwrite($handle, $fcontent);
+            fclose($handle);
 
             if($res===false){
                 return $this->ajaxErrorWithFreshToken(lang('save_err'));
@@ -213,22 +295,18 @@ class Template extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
-        $fname = $param['fname'];
-        if(!empty($fname)){
-            if(!is_array($fname)){
-                $fname = [$fname];
-            }
-            foreach($fname as $a){
-                $a = str_replace('\\','/',$a);
-
-                if( (substr($a,0,10) != "./template") || count( explode("./",$a) ) > 2) {
-
-                }
-                else{
-                    $a = mac_convert_encoding($a,"UTF-8","GB2312");
-                    if(file_exists($a)){ @unlink($a); }
-                }
+        $fname = isset($param['fname']) ? $param['fname'] : [];
+        if (!is_array($fname)) {
+            $fname = [$fname];
+        }
+        foreach ($fname as $a) {
+            $target = $this->resolveTemplateFilePath($a, false);
+            if ($target !== false && is_file($target)) {
+                @unlink($target);
             }
         }
         return $this->success(lang('del_ok'));

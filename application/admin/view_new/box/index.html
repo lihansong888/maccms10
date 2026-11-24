@@ -124,7 +124,7 @@
         });
         $(document).on('click', '.btn-disable,.btn-enable', function() {
             $.ajax({
-                type: 'get',
+                type: 'post',
                 dataType:'json',
                 url: "{:url('state')}",
                 data:{name:$(this).attr('data-name'),action:$(this).attr('data-action'),force:0},
@@ -138,7 +138,7 @@
         });
         $(document).on('click', '.btn-uninstall,.btn-install', function() {
             $.ajax({
-                type: 'get',
+                type: 'post',
                 dataType:'json',
                 url: "{:url('uninstall')}",
                 data:{name:$(this).attr('data-name'),action:$(this).attr('data-action'),force:0},

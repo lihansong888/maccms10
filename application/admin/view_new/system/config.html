@@ -1203,6 +1203,7 @@
 
         upload.render({
             elem: '.layui-upload'
+            ,data: { __token__: window.__MAC_ADMIN_CSRF__ || '' }
             , url: "{:url('upload/upload')}?flag=site"
             , method: 'post'
             , before: function (input) {
@@ -1400,6 +1401,7 @@
 
         upload.render({
             elem: '#upload_banner'
+            ,data: { __token__: window.__MAC_ADMIN_CSRF__ || '' }
             , url: "{:url('upload/upload')}?flag=site"
             , method: 'post'
             , before: function (input) {

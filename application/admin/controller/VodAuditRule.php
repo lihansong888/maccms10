@@ -82,6 +82,9 @@ class VodAuditRule extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         if (empty($ids)) {
@@ -97,6 +100,9 @@ class VodAuditRule extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         $col = $param['col'] ?? '';

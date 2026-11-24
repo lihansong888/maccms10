@@ -449,14 +449,8 @@ class Addon extends Base
      */
     public function uninstall()
     {
-        if (!$this->request->isPost()) {
-            return $this->error(lang('param_err'));
-        }
-        $post = $this->request->post();
-        $validate = \think\Loader::validate('Token');
-        if (!$validate->check($post)) {
-            $t = \think\Request::instance()->token('__token__');
-            return $this->error($validate->getError() ?: lang('param_err'), null, ['__token__' => $t]);
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
         }
         $name = $this->addonNameFromInput();
         if ($name === '') {
@@ -493,14 +487,8 @@ class Addon extends Base
      */
     public function state()
     {
-        if (!$this->request->isPost()) {
-            return $this->error(lang('param_err'));
-        }
-        $post = $this->request->post();
-        $validate = \think\Loader::validate('Token');
-        if (!$validate->check($post)) {
-            $t = \think\Request::instance()->token('__token__');
-            return $this->error($validate->getError() ?: lang('param_err'), null, ['__token__' => $t]);
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
         }
         $name = $this->addonNameFromInput();
         if ($name === '') {

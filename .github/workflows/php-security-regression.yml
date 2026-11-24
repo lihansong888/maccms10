@@ -1,0 +1,76 @@
+name: PHP Security Regression
+
+on:
+  push:
+    branches:
+      - security-audit-clean
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  php-security-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: PHP syntax checks
+        run: |
+          php -l application/common/model/Collect.php
+          php -l application/common/model/Card.php
+          php -l application/admin/controller/Template.php
+          php -l application/common/model/Website.php
+          php -l application/common/model/Actor.php
+          php -l application/admin/controller/Cash.php
+          php -l application/admin/controller/User.php
+          php -l application/admin/controller/Monitor.php
+          php -l application/admin/controller/Notify.php
+          php -l application/index/controller/Comment.php
+          php -l application/index/controller/Gbook.php
+          php -l application/api/controller/Comment.php
+          php -l application/api/controller/Gbook.php
+          php -l application/common/model/User.php
+          php -l application/common/util/Collection.php
+          php -l application/common/model/Image.php
+          php -l application/common.php
+          php -l application/extra/maccms.php
+          php -l tests/regression/ssrf_collection.php
+          php -l tests/regression/card_redemption_transaction.php
+          php -l tests/regression/template_path_safety.php
+          php -l tests/regression/sql_order_injection.php
+          php -l tests/regression/template_expression_safety.php
+          php -l tests/regression/admin_write_csrf.php
+          php -l tests/regression/comment_mass_assignment.php
+          php -l tests/regression/password_reset_rate_limit.php
+          php -l tests/regression/player_remote_defaults.php
+          php -l tests/regression/ssrf_user_controlled_fetches.php
+          php -l tests/regression/admin_delete_csrf.php
+      - name: Admin controller syntax checks
+        run: |
+          for file in application/admin/controller/*.php; do php -l "$file"; done
+      - name: Collection SSRF regression
+        run: php tests/regression/ssrf_collection.php
+      - name: Card redemption regression
+        run: php tests/regression/card_redemption_transaction.php
+      - name: Template path regression
+        run: php tests/regression/template_path_safety.php
+      - name: SQL order injection regression
+        run: php tests/regression/sql_order_injection.php
+      - name: Template expression injection regression
+        run: php tests/regression/template_expression_safety.php
+      - name: Admin CSRF regression
+        run: php tests/regression/admin_write_csrf.php
+      - name: Public comment mass assignment regression
+        run: php tests/regression/comment_mass_assignment.php
+      - name: Password reset rate limit regression
+        run: php tests/regression/password_reset_rate_limit.php
+      - name: Player remote defaults regression
+        run: php tests/regression/player_remote_defaults.php
+      - name: User-controlled SSRF regression
+        run: php tests/regression/ssrf_user_controlled_fetches.php
+      - name: Admin delete CSRF regression
+        run: php tests/regression/admin_delete_csrf.php

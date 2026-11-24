@@ -829,6 +829,9 @@ class Vod extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -934,6 +937,9 @@ class Vod extends Base
      */
     public function audit()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         $status = intval($param['status'] ?? -1);

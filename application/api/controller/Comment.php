@@ -128,6 +128,9 @@ class Comment extends Base
      */
     public function submit(Request $request)
     {
+        if (!$request->isPost()) {
+            return json(['code' => 1001, 'msg' => lang('param_err')]);
+        }
         $param = $request->param();
         $cmid = isset($param['comment_mid']) ? (string) $param['comment_mid'] : '';
         if (!in_array($cmid, ['1', '2', '3', '8', '9', '11', '12'], true)) {

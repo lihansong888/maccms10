@@ -7,6 +7,24 @@ class Cj extends Base
 {
     var $_isall=0;
 
+    /**
+     * 定时采集器会在同一请求内调用本控制器；仅放行明确的 api/timming/index 内部调用。
+     * 直接访问后台采集动作仍必须使用带 CSRF 令牌的 POST。
+     */
+    private function isInternalTimmingRequest()
+    {
+        $request = Request();
+        return strtolower((string)$request->module()) === 'api'
+            && strtolower((string)$request->controller()) === 'timming'
+            && strtolower((string)$request->action()) === 'index';
+    }
+
+    private function collectionRequestAllowed()
+    {
+        return $this->isInternalTimmingRequest()
+            || (Request()->isPost() && $this->adminCsrfOk());
+    }
+
     public function __construct()
     {
         parent::__construct();
@@ -40,6 +58,9 @@ class Cj extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input();
             $data = $param['data'];
             $data['urlpage'] = (string)$param['urlpage'.$data['sourcetype']];
@@ -82,6 +103,9 @@ class Cj extends Base
         }
 
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $program_config = [];
             foreach($param['model_field'] as $k=>$v){
                 if(!empty($param['node_field'][$k])){
@@ -130,6 +154,9 @@ class Cj extends Base
 
     public function col_all($param)
     {
+        if (!$this->collectionRequestAllowed()) {
+            return $this->error(lang('token_err'));
+        }
         $this->_isall=1;
         $this->col_url($param);
     }
@@ -137,6 +164,9 @@ class Cj extends Base
 
     //采集网址
     public function col_url($param=[]) {
+        if (!$this->collectionRequestAllowed()) {
+            return $this->error(lang('token_err'));
+        }
         if(empty($param)){
             $param = input();
         }
@@ -214,6 +244,9 @@ class Cj extends Base
 
     //采集文章
     public function col_content($param=[]) {
+        if (!$this->collectionRequestAllowed()) {
+            return $this->error(lang('token_err'));
+        }
         if(empty($param)){
             $param = input();
         }
@@ -326,6 +359,9 @@ class Cj extends Base
 
     public function content_del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $all = $param['all'];
@@ -357,6 +393,9 @@ class Cj extends Base
 
     public function content_into($param=[])
     {
+        if (!$this->collectionRequestAllowed()) {
+            return $this->error(lang('token_err'));
+        }
         if(empty($param)){
             $param = input();
         }
@@ -474,6 +513,9 @@ class Cj extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -513,6 +555,9 @@ class Cj extends Base
 
     public function import()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $file = $this->request->file('file');
         $info = $file->rule('uniqid')->validate(['size' => 10240000, 'ext' => 'txt']);
         if ($info) {

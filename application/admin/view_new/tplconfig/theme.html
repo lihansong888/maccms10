@@ -2809,6 +2809,7 @@ $hotvod_tabs_list = (!empty($tplconfig['theme']['hotvod']['tabs']) && is_array($
             });
             upload.render({
                 elem: '.layui-upload'
+            ,data: { __token__: window.__MAC_ADMIN_CSRF__ || '' }
                 , url: "{:url('upload/upload')}?flag=site"
                 , method: 'post'
                 , before: function (input) {
@@ -3102,6 +3103,7 @@ $hotvod_tabs_list = (!empty($tplconfig['theme']['hotvod']['tabs']) && is_array($
                 if (!$elems.length) { return; }
                 upload.render({
                     elem: $elems
+            ,data: { __token__: window.__MAC_ADMIN_CSRF__ || '' }
                     , url: "{:url('upload/upload')}?flag=site"
                     , method: 'post'
                     , before: function (input) {

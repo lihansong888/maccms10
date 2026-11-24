@@ -401,7 +401,7 @@ class Website extends Base {
         if ($use_rnd_order) {
             $order = ['[rand]' => '[rand]'];
         } elseif ($by == 'in' && !empty($name)) {
-            $order = ' find_in_set(website_name, \'' . $name . '\'  ) ';
+            $order = ' find_in_set(website_name, ' . Db::quote((string)$name) . ' ) ';
         } else {
             if ($by == 'in' && empty($name)) {
                 $by = 'time';

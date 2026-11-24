@@ -67,6 +67,9 @@ class Notify extends Base
 
     public function broadcast()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input('post.');
         $type = isset($param['notify_type']) ? trim($param['notify_type']) : '';
         $title = isset($param['notify_title']) ? trim($param['notify_title']) : '';
@@ -119,6 +122,9 @@ class Notify extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = isset($param['ids']) ? $param['ids'] : '';
         $all = isset($param['all']) ? $param['all'] : '';
@@ -146,6 +152,9 @@ class Notify extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         if (empty($param['id']) || !isset($param['col']) || !isset($param['val'])) {
             return $this->error(lang('param_err'));

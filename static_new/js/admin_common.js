@@ -211,6 +211,50 @@ layui.define(['element', 'form'], function (exports) {
             _ids = ids.join(',');
             _url = _url.indexOf('?') > -1 ? _url + '&ids=' + _ids : _url + '?ids=' + _ids;
         }
+        if (String(that.attr('data-method') || 'get').toLowerCase() === 'post') {
+            var csrfToken = window.__MAC_ADMIN_CSRF__ || '';
+            if (!csrfToken) {
+                layer.msg('安全令牌缺失，请刷新页面后重试');
+                return false;
+            }
+            var frameName = 'macAdminPostFrame_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            var postLayer = layer.open({
+                type: 2,
+                title: _title,
+                content: 'about:blank',
+                area: [_width + '', _height + ''],
+                success: function (layero) {
+                    var frame = layero.find('iframe')[0];
+                    if (!frame) {
+                        layer.msg('无法创建操作窗口');
+                        return;
+                    }
+                    frame.name = frameName;
+                    var postForm = document.createElement('form');
+                    postForm.method = 'POST';
+                    postForm.action = _url;
+                    postForm.target = frameName;
+                    postForm.style.display = 'none';
+                    var tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '__token__';
+                    tokenInput.value = csrfToken;
+                    postForm.appendChild(tokenInput);
+                    document.body.appendChild(postForm);
+                    postForm.submit();
+                    setTimeout(function () {
+                        if (postForm.parentNode) {
+                            postForm.parentNode.removeChild(postForm);
+                        }
+                    }, 0);
+                }
+            });
+            if (_full == '1') {
+                layer.full(postLayer);
+            }
+            return false;
+        }
+
         var lay = layer.open({ type: 2, title: _title, content: _url, area: [_width + '', _height + ''] });
         if (_full == '1') {
             layer.full(lay);
@@ -227,6 +271,14 @@ layui.define(['element', 'form'], function (exports) {
         form.render('checkbox');
     });
 
+    // 后台写操作默认 POST；仅显式声明 data-method="get" 时才保留 GET。
+    function macAdminActionRequest(url, data, method, callback) {
+        if (String(method || 'post').toLowerCase() === 'post') {
+            return $.post(url, data || {}, callback);
+        }
+        return $.get(url, data || {}, callback);
+    }
+
     /* 监听状态设置开关 */
     form.on('switch(switchStatus)', function (data) {
         var that = $(this), status = 0;
@@ -237,7 +289,7 @@ layui.define(['element', 'form'], function (exports) {
         if (this.checked) {
             status = 1;
         }
-        $.get(that.attr('data-href'), { val: status }, function (res) {
+        macAdminActionRequest(that.attr('data-href'), { val: status }, that.attr('data-method'), function (res) {
             layer.msg(res.msg);
             if (res.code == 0) {
                 that.trigger('click');
@@ -371,7 +423,7 @@ layui.define(['element', 'form'], function (exports) {
                 layer.msg('请设置data-href参数');
                 return false;
             }
-            $.get(href, function (res) {
+            macAdminActionRequest(href, {}, that.attr('data-method'), function (res) {
                 layer.msg(res.msg);
                 if (res.code == 1) {
                     that.parents('tr').remove();
@@ -395,7 +447,7 @@ layui.define(['element', 'form'], function (exports) {
 
         if (!that.attr('confirm')) {
             layer.msg('数据提交中...', { time: 500000 });
-            $.get(href, {}, function (res) {
+            macAdminActionRequest(href, {}, that.attr('data-method'), function (res) {
                 layer.msg(res.msg, {}, function () {
                     if (refresh == 'yes') {
                         if (typeof (res.url) != 'undefined' && res.url != null && res.url != '') {
@@ -411,7 +463,7 @@ layui.define(['element', 'form'], function (exports) {
         else {
             layer.confirm(that.attr('confirm'), { title: false, closeBtn: 0 }, function (index) {
                 layer.msg('数据提交中...', { time: 500000 });
-                $.get(href, {}, function (res) {
+                macAdminActionRequest(href, {}, that.attr('data-method'), function (res) {
                     layer.msg(res.msg, {}, function () {
                         if (refresh == 'yes') {
                             if (typeof (res.url) != 'undefined' && res.url != null && res.url != '') {

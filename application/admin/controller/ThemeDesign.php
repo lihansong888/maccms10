@@ -3990,6 +3990,9 @@ class ThemeDesign extends Base
     /** 图片上传（logo / default_avatar），复用 Upload 模型 */
     public function upload()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $res = model('Upload')->upload(array('input' => 'file', 'flag' => 'images'));
         // 后台(ENTRANCE=admin)下 Upload 返回 {code,msg,data:{file}}，前端读取 res.file，这里统一归一化为顶层 file 并补全为可用 URL
         $file = '';

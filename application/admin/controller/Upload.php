@@ -35,9 +35,35 @@ class Upload extends Base
         }
     }
 
+    /**
+     * 富文本编辑器旧上传协议无法统一附带 CSRF 字段，令牌缺失时仅接受严格同源请求。
+     */
+    private function uploadRequestAllowed()
+    {
+        if ($this->adminCsrfOk()) {
+            return true;
+        }
+
+        $requestHost = strtolower((string)parse_url('http://' . $this->request->host(), PHP_URL_HOST));
+        $origin = (string)$this->request->header('origin');
+        $referer = (string)$this->request->header('referer');
+        $originHost = $origin !== '' ? strtolower((string)parse_url($origin, PHP_URL_HOST)) : '';
+        $refererHost = $referer !== '' ? strtolower((string)parse_url($referer, PHP_URL_HOST)) : '';
+        $fetchSite = strtolower((string)$this->request->header('sec-fetch-site'));
+
+        return ($requestHost !== '' && (
+            $originHost === $requestHost ||
+            $refererHost === $requestHost ||
+            $fetchSite === 'same-origin'
+        ));
+    }
+
     public function upload($p=[])
     {
-		return model('Upload')->upload($p);
+        if (!$this->request->isPost() || !$this->uploadRequestAllowed()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
+        return model('Upload')->upload($p);
     }
 
     /**

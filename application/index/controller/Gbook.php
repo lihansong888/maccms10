@@ -1,8 +1,12 @@
 <?php
 namespace app\index\controller;
 
+use app\common\util\CsrfGuard;
+
 class Gbook extends Base
 {
+    use CsrfGuard;
+
     var $_config;
     public function __construct()
     {
@@ -42,7 +46,17 @@ class Gbook extends Base
     }
     
     public function saveData() {
+        if (!Request()->isPost()) {
+            return ['code' => 1001, 'msg' => lang('param_err')];
+        }
+        $csrfErr = $this->checkCsrf();
+        if ($csrfErr !== null) {
+            return $csrfErr;
+        }
+
         $param = input();
+        // 留言接口只接受正文、访客显示名和验证码；身份、回复、审核、计数等字段由服务器生成。
+        $param = array_intersect_key($param, array_flip(['gbook_content', 'gbook_name', 'verify']));
 
         if($GLOBALS['config']['gbook']['verify'] == 1){
             if(!captcha_check($param['verify'])){
@@ -50,14 +64,14 @@ class Gbook extends Base
             }
         }
 
-        if($GLOBALS['config']['gbook']['login'] ==1){
-            if(empty(cookie('user_id'))){
-                return ['code' => 1003, 'msg' => lang('index/require_login')];
-            }
-            $res = model('User')->checkLogin();
-            if($res['code']>1) {
-                return ['code' => 1003, 'msg' => lang('index/require_login')];
-            }
+        // 始终验证登录身份；不能直接信任可伪造的 user_id / user_name Cookie。
+        $authUser = null;
+        $authResult = model('User')->checkLogin();
+        if (isset($authResult['code']) && intval($authResult['code']) === 1 && !empty($authResult['info'])) {
+            $authUser = $authResult['info'];
+        }
+        if ($GLOBALS['config']['gbook']['login'] == 1 && empty($authUser)) {
+            return ['code' => 1003, 'msg' => lang('index/require_login')];
         }
 
         if(empty($param['gbook_content'])){
@@ -76,23 +90,16 @@ class Gbook extends Base
 
         $param['gbook_reply'] = '';
 
-        if(empty(cookie('user_id'))){
-            $param['gbook_name'] = lang('controller/visitor');
-            $param['user_id']=0;
-        }
-        else{
-            $param['gbook_name'] = cookie('user_name');
-            $param['user_id'] = intval(cookie('user_id'));
-            $user_data = model('User')->field('user_nick_name')->where(['user_id' => $param['user_id']])->find();
-            if (!empty($user_data['user_nick_name'])) {
-                $param['gbook_name'] = $user_data['user_nick_name'];
-            }
+        if (empty($authUser)) {
+            $param['user_id'] = 0;
+            $param['gbook_name'] = !empty($param['gbook_name']) ? $param['gbook_name'] : lang('controller/visitor');
+        } else {
+            $param['user_id'] = intval($authUser['user_id']);
+            $param['gbook_name'] = !empty($authUser['user_nick_name']) ? $authUser['user_nick_name'] : $authUser['user_name'];
         }
         $param['gbook_name'] = htmlentities(trim($param['gbook_name']));
 
-        if($GLOBALS['config']['gbook']['audit'] ==1){
-            $param['gbook_status'] = 0;
-        }
+        $param['gbook_status'] = ($GLOBALS['config']['gbook']['audit'] == 1) ? 0 : 1;
 
         $param['gbook_ip'] = mac_get_ip_long();
 

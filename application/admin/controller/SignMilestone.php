@@ -65,6 +65,9 @@ class SignMilestone extends Base
     // 删除里程碑
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         if (!empty($ids)) {
@@ -82,6 +85,9 @@ class SignMilestone extends Base
     // 修改状态
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

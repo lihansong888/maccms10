@@ -65,6 +65,9 @@ class Database extends Base
     public function export($ids = '', $start = 0)
     {
         if ($this->request->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             if (empty($ids)) {
                 return $this->error(lang('admin/database/select_export_table'));
             }
@@ -154,6 +157,9 @@ class Database extends Base
      */
     public function uploadStorage($id = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $id = intval($id);
         if ($id <= 0) {
             return $this->error(lang('admin/database/select_file'));
@@ -178,6 +184,9 @@ class Database extends Base
      */
     public function import($id = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($id)) {
             return $this->error(lang('admin/database/select_file'));
         }
@@ -219,6 +228,9 @@ class Database extends Base
 
     public function optimize($ids = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($ids)) {
             return $this->error(lang('admin/database/select_optimize_table'));
         }
@@ -245,6 +257,9 @@ class Database extends Base
 
     public function repair($ids = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($ids)) {
             return $this->error(lang('admin/database/select_repair_table'));
         }
@@ -271,6 +286,9 @@ class Database extends Base
 
     public function del($id = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($id)) {
             return $this->error(lang('admin/database/select_del_file'));
         }
@@ -288,9 +306,8 @@ class Database extends Base
     {
         if($this->request->isPost()){
             $param=input();
-            $validate = \think\Loader::validate('Token');
-            if(!$validate->check($param)){
-                return $this->ajaxErrorWithFreshToken($validate->getError());
+            if (!$this->adminCsrfOk()) {
+                return $this->ajaxErrorWithFreshToken(lang('token_err'));
             }
 
             $sql = trim($param['sql']);
@@ -343,9 +360,8 @@ class Database extends Base
             $tostr = isset($param['tostr']) ? $param['tostr'] : '';
             $where = isset($param['where']) ? $param['where'] : '';
 
-            $validate = \think\Loader::validate('Token');
-            if(!$validate->check($param)){
-                return $this->ajaxErrorWithFreshToken($validate->getError());
+            if (!$this->adminCsrfOk()) {
+                return $this->ajaxErrorWithFreshToken(lang('token_err'));
             }
             if ($table === '' || !$this->isValidTable($table)) {
                 return $this->ajaxErrorWithFreshToken('Table is invalid.');

@@ -6,6 +6,7 @@ use app\common\util\Pinyin;
 use app\common\util\Dir;
 use think\Request;
 use app\common\validate\Vod as VodValidate;
+use app\common\util\HttpClient;
 
 class Collect extends Base {
 
@@ -227,7 +228,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -376,7 +377,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -1376,7 +1377,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -1451,7 +1452,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -1798,7 +1799,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -2091,7 +2092,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -2393,7 +2394,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -2689,7 +2690,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }
@@ -2941,10 +2942,13 @@ class Collect extends Base {
      */
     private function checkCjUrl($url)
     {
-        $result = parse_url($url);
-        if (empty($result['host']) || in_array($result['host'], ['127.0.0.1', 'localhost'])) {
+        $result = @parse_url((string)$url);
+        if (empty($result['host']) || empty($result['scheme'])
+            || !in_array(strtolower($result['scheme']), ['http', 'https'], true)
+            || isset($result['user']) || isset($result['pass'])) {
             return ['code' => 1001, 'msg' => lang('model/collect/cjurl_err') . ': ' . $url];
         }
+        // 实际 DNS 公网校验、连接 IP 固定及逐跳重定向校验由 HttpClient::safeGet 完成。
         return ['code' => 1];
     }
 
@@ -2977,7 +2981,7 @@ class Collect extends Base {
         if ($result['code'] > 1) {
             return $result;
         }
-        $html = mac_curl_get($url, [], '', false);
+        $html = HttpClient::safeGet($url, 30, false);
         if(empty($html)){
             return ['code'=>1001, 'msg'=>lang('model/collect/get_html_err') . ', url: ' . $url];
         }

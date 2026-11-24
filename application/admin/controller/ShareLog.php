@@ -47,6 +47,9 @@ class ShareLog extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         $all = $param['all'] ?? '';

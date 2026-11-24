@@ -138,7 +138,7 @@
                 var url = "{:url('meilisearch/setup')}";
                 setupBtn.disabled = true;
                 setupBtn.innerText = "{:lang('admin/meilisearch/setup_running')}";
-                $.post(url, {}, function (res) {
+                $.post(url, {__token__: $('#meiliConfigForm input[name="__token__"]').val()}, function (res) {
                     setupBox.style.display = 'block';
                     setupBox.textContent = JSON.stringify(res || {}, null, 2);
                     var ok = res && parseInt(res.code, 10) === 1;

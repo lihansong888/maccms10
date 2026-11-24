@@ -2,12 +2,14 @@
 namespace app\common\model;
 use think\Db;
 use think\Config;
+use app\common\util\HttpClient;
 
 class Addon extends Base {
 
     public function onlineData($page=1)
     {
-        $html = mac_curl_get( base64_decode('6aKE55WZ5Yqf6IO9').'store/?page=' . $page);
+        $url = base64_decode('6aKE55WZ5Yqf6IO9') . 'store/?page=' . max(1, intval($page));
+        $html = HttpClient::safeGet($url, 15, true, 3);
         $json = json_decode($html, true);
         if (!$json) {
             return ['code' => 1001, 'msg' => lang('obtain_err')];

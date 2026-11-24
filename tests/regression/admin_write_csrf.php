@@ -103,4 +103,23 @@ rt_same(false, $g::tokenAccepted('x', 'abc', 'def'), 'wrong token rejected');
 rt_same(true, $g::tokenAccepted('abc', 'abc', ''), 'stable token accepted');
 rt_same(true, $g::tokenAccepted('def', 'abc', 'def'), 'legacy token accepted');
 
+// 被强制改为 POST 的按钮也必须显式选择 POST，避免后台 JS 默认 GET 导致功能失效。
+$cashView = file_get_contents(APP_PATH . 'admin/view_new/cash/index.html');
+rt_check(strpos($cashView, "data-method=\"post\"") !== false
+    && substr_count($cashView, "data-method=\"post\"") >= 3,
+    '[forced_csrf_ui] cash delete / clear / audit controls must use POST');
+$userView = file_get_contents(APP_PATH . 'admin/view_new/user/index.html');
+rt_check(strpos($userView, "class=\"layui-badge-rim j-tr-del\" data-method=\"post\"") !== false,
+    '[forced_csrf_ui] user row delete must use POST');
+$adminView = file_get_contents(APP_PATH . 'admin/view_new/admin/index.html');
+rt_check(strpos($adminView, "class=\"layui-badge-rim j-tr-del\" data-method=\"post\"") !== false,
+    '[forced_csrf_ui] administrator row delete must use POST');
+$cardView = file_get_contents(APP_PATH . 'admin/view_new/card/index.html');
+rt_check(strpos($cardView, "class=\"layui-badge-rim j-tr-del\" data-method=\"post\"") !== false
+    && strpos($cardView, "data-method=\"post\"") !== false,
+    '[forced_csrf_ui] card deletion and bulk clear must use POST');
+$collectView = file_get_contents(APP_PATH . 'admin/view_new/collect/index.html');
+rt_check(strpos($collectView, "class=\"layui-badge-rim j-tr-del\" data-method=\"post\"") !== false,
+    '[forced_csrf_ui] collection deletion must use POST');
+
 rt_done('admin write endpoints forced CSRF');

@@ -65,7 +65,7 @@
                         <a class="layui-badge-rim layui-bg-green j-iframe" data-full="1"
                             data-href="{:url('info?id='.$vo['type_id'])}" href="javascript:;"
                             title="{:lang('edit')}">{:lang('edit')}</a>
-                        <a class="layui-badge-rim layui-bg-green j-tr-del" data-href="{:url('del?ids='.$vo['type_id'])}"
+                        <a class="layui-badge-rim layui-bg-green j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['type_id'])}"
                             href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                         <a class="layui-badge-rim layui-bg-green j-iframe" data-full="1"
                             data-href="{:url('info')}?pid={$vo.type_id}" href="javascript:;"
@@ -100,7 +100,7 @@
                         <a class="layui-badge-rim layui-bg-green j-iframe" data-full="1"
                             data-href="{:url('info?id='.$ch['type_id'])}" href="javascript:;"
                             title="{:lang('edit')}">{:lang('edit')}</a>
-                        <a class="layui-badge-rim layui-bg-green j-tr-del" data-href="{:url('del?ids='.$ch['type_id'])}"
+                        <a class="layui-badge-rim layui-bg-green j-tr-del" data-method="post" data-href="{:url('del?ids='.$ch['type_id'])}"
                             href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                     </td>
                 </tr>

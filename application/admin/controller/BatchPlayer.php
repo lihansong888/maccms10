@@ -36,6 +36,9 @@ class BatchPlayer extends Base
      */
     public function batchStatus()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $froms = $param['froms'] ?? [];
         $status = intval($param['status'] ?? 1);
@@ -69,6 +72,9 @@ class BatchPlayer extends Base
      */
     public function batchSort()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $sorts = $param['sorts'] ?? [];
 
@@ -97,6 +103,9 @@ class BatchPlayer extends Base
      */
     public function batchParse()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $froms = $param['froms'] ?? [];
         $parse = trim($param['parse'] ?? '');
@@ -130,6 +139,9 @@ class BatchPlayer extends Base
      */
     public function batchDel()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $froms = $param['froms'] ?? [];
 
@@ -162,6 +174,9 @@ class BatchPlayer extends Base
      */
     public function replaceFrom()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $old_from = trim($param['old_from'] ?? '');
         $new_from = trim($param['new_from'] ?? '');

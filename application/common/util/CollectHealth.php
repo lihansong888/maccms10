@@ -329,7 +329,7 @@ class CollectHealth
                     // 跳转：下一跳重新排队，出队时同样走公网校验 + 钉 IP（证书降级状态随跳延续）
                     $queue[] = ['key' => $job['key'], 'url' => $next, 'hops' => $job['hops'] + 1, 'insecure' => $job['insecure']];
                 } elseif (empty($job['insecure']) && self::isCertError($info['result'])) {
-                    // 证书无效：采集流程本身不校验证书（Collect 里 mac_curl_get(..., false)），检测若就此判失败
+                    // 证书无效：采集流程本身允许安全请求在公网 IP 固定后关闭证书校验（Collect 里 HttpClient::safeGet(..., false)），检测若就此判失败
                     // 会把「能采集」的接口误停用。同一地址降级为不校验重试一次，结果里注明证书问题供站长处理。
                     $queue[] = ['key' => $job['key'], 'url' => $job['url'], 'hops' => $job['hops'], 'insecure' => true];
                 } else {

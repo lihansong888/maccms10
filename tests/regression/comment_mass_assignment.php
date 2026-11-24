@@ -32,9 +32,11 @@ rt_check(strpos($guestbookBody, 'model(\'User\')->checkLogin()') !== false, 'sit
 rt_check(strpos($guestbookBody, '$authUser[\'user_id\']') !== false, 'site guestbook uses verified user id');
 rt_check(strpos($guestbookBody, "'gbook_status'] = (\$GLOBALS['config']['gbook']['audit'] == 1) ? 0 : 1") !== false, 'guestbook status is always server-controlled');
 
+rt_check(strpos($commentBody, 'Request()->isPost()') !== false, 'site comment submit requires POST');
 rt_check(strpos($commentBody, '$this->checkCsrf()') !== false, 'site comment form validates same-origin CSRF');
 $indexGuestbook = rt_functions(APP_PATH . 'index/controller/Gbook.php');
 $siteGuestbookBody = isset($indexGuestbook['saveData']) ? $indexGuestbook['saveData']['body'] : '';
+rt_check(strpos($siteGuestbookBody, 'Request()->isPost()') !== false, 'site guestbook submit requires POST');
 rt_check(strpos($siteGuestbookBody, '$this->checkCsrf()') !== false, 'site guestbook form validates same-origin CSRF');
 
 $apiComment = rt_functions(APP_PATH . 'api/controller/Comment.php');

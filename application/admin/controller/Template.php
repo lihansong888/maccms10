@@ -272,6 +272,9 @@ class Template extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $fname = isset($param['fname']) ? $param['fname'] : [];
         if (!is_array($fname)) {

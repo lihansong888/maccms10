@@ -14,7 +14,7 @@ layui.use(['jquery','layer'], function(){
             function(confirmIndex){
                 layer.close(confirmIndex);
                 layer.load(2);
-                $.post('{:url("meilisearch/sync")}', {}, function(r){
+                $.post('{:url("meilisearch/sync")}', {__token__: '{:mac_admin_csrf_token()}'}, function(r){
                     layer.closeAll('loading');
                     $('#out').text(JSON.stringify(r, null, 2));
                     layer.msg(r.ok ? '{:lang("admin/meilisearch/done")}' : (r.msg || '{:lang("admin/meilisearch/failed")}'));

@@ -55,8 +55,14 @@ class HttpClient
     {
         $url = (string)$url;
         for ($hop = 0; $hop <= $maxRedirects; $hop++) {
-            $parts = parse_url($url);
-            if (empty($parts['scheme']) || !in_array(strtolower($parts['scheme']), array('http', 'https'), true) || empty($parts['host'])) {
+            $parts = @parse_url($url);
+            if (!is_array($parts)
+                || empty($parts['scheme'])
+                || !in_array(strtolower($parts['scheme']), array('http', 'https'), true)
+                || empty($parts['host'])
+                || isset($parts['user'])
+                || isset($parts['pass'])
+                || (isset($parts['port']) && ($parts['port'] < 1 || $parts['port'] > 65535))) {
                 return false;
             }
             $ip = self::resolvePublicIp($parts['host']);

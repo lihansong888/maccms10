@@ -138,6 +138,19 @@ assert_true(
 
 $resetBody = extract_method_body($userModel, 'findpass_reset');
 assert_true($resetBody !== false, 'Unable to locate User::findpass_reset() body.');
+$reserveBody = extract_method_body($userModel, 'reserveFindpassAttempt');
+assert_true($reserveBody !== false, 'Unable to locate User::reserveFindpassAttempt() body.');
+assert_true(
+    strpos($reserveBody, 'flock($fp, LOCK_EX)') !== false
+        && strpos($reserveBody, 'Cache::get($key, 0)') !== false
+        && strpos($reserveBody, 'Cache::set($key, $next, 600)') !== false,
+    'Password reset attempt reservation must lock the shared cache read/modify/write sequence.'
+);
+assert_true(
+    strpos($reserveBody, 'if ($attempts >= 5)') !== false
+        && strpos($reserveBody, 'return 6;') !== false
+        && strpos($resetBody, 'if ($attempts > 5)') !== false,
+    'Password reset throttle must allow five attempts and reject the sixth.');
 assert_true(
     strpos($resetBody, "where(['user_id' => intval($user['user_id'])])") !== false,
     'Password reset must update only the single matched user ID, not every duplicate email/phone.'

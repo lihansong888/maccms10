@@ -65,14 +65,14 @@
                 <td>{$vo.live_hits}</td>
                 <td>
                     {if condition="$vo['live_status'] eq 1"}
-                    <a class="layui-badge layui-bg-green j-ajax" data-href="{:url('field?ids='.$vo['live_id'].'&col=live_status&val=0')}" href="javascript:;">{:lang('enable')}</a>
+                    <a class="layui-badge layui-bg-green j-ajax" data-method="post" data-href="{:url('field?ids='.$vo['live_id'].'&col=live_status&val=0')}" href="javascript:;">{:lang('enable')}</a>
                     {else/}
-                    <a class="layui-badge j-ajax" data-href="{:url('field?ids='.$vo['live_id'].'&col=live_status&val=1')}" href="javascript:;">{:lang('disable')}</a>
+                    <a class="layui-badge j-ajax" data-method="post" data-href="{:url('field?ids='.$vo['live_id'].'&col=live_status&val=1')}" href="javascript:;">{:lang('disable')}</a>
                     {/if}
                 </td>
                 <td>
                     <a class="layui-badge-rim j-iframe" data-href="{:url('info?id='.$vo['live_id'])}" href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['live_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['live_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

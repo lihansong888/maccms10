@@ -186,7 +186,18 @@ class AiProvider
      */
     private static function curlPost($url, $data, $heads, $timeout, $verifySsl = true)
     {
+        $parts = @parse_url((string)$url);
+        if (!is_array($parts)
+            || empty($parts['scheme'])
+            || !in_array(strtolower($parts['scheme']), ['http', 'https'], true)
+            || empty($parts['host'])
+            || isset($parts['user'])
+            || isset($parts['pass'])
+            || (isset($parts['port']) && ($parts['port'] < 1 || $parts['port'] > 65535))) {
+            return false;
+        }
         $ch = @curl_init();
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36');
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

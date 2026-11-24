@@ -237,7 +237,7 @@ layui.define(['element', 'form'], function (exports) {
         if (this.checked) {
             status = 1;
         }
-        $.get(that.attr('data-href'), { val: status }, function (res) {
+        $.post(that.attr('data-href'), { val: status }, function (res) {
             layer.msg(res.msg);
             if (res.code == 0) {
                 that.trigger('click');

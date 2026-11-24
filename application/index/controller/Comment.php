@@ -37,6 +37,11 @@ class Comment extends Base
     public function saveData() {
         $param = input();
 
+        // 公共评论接口只接收用户可填写字段；user_id、comment_id、审核状态、IP、
+        // 赞踩/举报计数等必须由服务器或后台控制，不能从请求参数直接写入。
+        $allowedFields = ['comment_mid', 'comment_rid', 'comment_pid', 'comment_content', 'verify', 'mid', 'rid'];
+        $param = array_intersect_key($param, array_flip($allowedFields));
+
         // 兼容：部分模板/历史版本会使用 mid/rid 作为参数名
         if (empty($param['comment_mid']) && isset($param['mid'])) {
             $param['comment_mid'] = $param['mid'];
@@ -102,6 +107,7 @@ class Comment extends Base
         }
 
         if(empty(cookie('user_id'))){
+            $param['user_id'] = 0;
             $param['comment_name'] = lang('controller/visitor');
         }
         else{

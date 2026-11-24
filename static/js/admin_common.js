@@ -334,10 +334,10 @@ layui.define(['element', 'form'], function(exports) {
             return false;
         }
 
+        var method = (that.attr('data-method') || 'GET').toUpperCase();
+        var request = method === 'POST' ? $.post : $.get;
         if (!that.attr('confirm')) {
             layer.msg('数据提交中...', {time:500000});
-            var method = (that.attr('data-method') || 'GET').toUpperCase();
-            var request = method === 'POST' ? $.post : $.get;
             request(href, {}, function(res) {
                 layer.msg(res.msg, {}, function() {
                     if (refresh == 'yes') {
@@ -354,7 +354,7 @@ layui.define(['element', 'form'], function(exports) {
         else {
             layer.confirm(that.attr('confirm'), {title:false, closeBtn:0}, function(index){
                 layer.msg('数据提交中...', {time:500000});
-                $.get(href, {}, function(res) {
+                request(href, {}, function(res) {
                     layer.msg(res.msg, {}, function() {
                         if (refresh == 'yes') {
                             if (typeof(res.url) != 'undefined' && res.url != null && res.url != '') {

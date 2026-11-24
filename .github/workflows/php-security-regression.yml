@@ -43,6 +43,10 @@ jobs:
           php -l tests/regression/password_reset_rate_limit.php
           php -l tests/regression/player_remote_defaults.php
           php -l tests/regression/ssrf_user_controlled_fetches.php
+          php -l tests/regression/admin_delete_csrf.php
+      - name: Admin controller syntax checks
+        run: |
+          for file in application/admin/controller/*.php; do php -l "$file"; done
       - name: Collection SSRF regression
         run: php tests/regression/ssrf_collection.php
       - name: Card redemption regression
@@ -63,3 +67,5 @@ jobs:
         run: php tests/regression/player_remote_defaults.php
       - name: User-controlled SSRF regression
         run: php tests/regression/ssrf_user_controlled_fetches.php
+      - name: Admin delete CSRF regression
+        run: php tests/regression/admin_delete_csrf.php

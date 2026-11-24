@@ -56,3 +56,6 @@ jobs:
 
       - name: Regression test local player loading pages
         run: php tests/regression/player_loading_local.php
+
+      - name: Regression test TVBox configuration
+        run: php tests/regression/tvbox_config.php

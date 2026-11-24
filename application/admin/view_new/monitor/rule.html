@@ -80,7 +80,7 @@
             var fd = new FormData();
             fd.append('id', data.elem.getAttribute('data-id'));
             fd.append('status', data.elem.checked ? '1' : '0');
-            fetch(FIELD_URL, {method: 'POST', body: fd, credentials: 'same-origin'})
+            fetch(FIELD_URL, {method: 'POST', body: fd, credentials: 'same-origin', headers: {'X-CSRF-Token': window.__MAC_ADMIN_CSRF__ || ''}})
                 .then(function (r) { return r.json(); })
                 .then(function (res) { layer.msg(res.msg); });
         });
@@ -90,7 +90,9 @@
         b.addEventListener('click', function () {
             layer.confirm("{:lang('del_confirm')}", function (idx) {
                 layer.close(idx);
-                fetch(DEL_URL + '?id=' + b.getAttribute('data-id'), {credentials: 'same-origin'})
+                var fd = new FormData();
+                fd.append('id', b.getAttribute('data-id'));
+                fetch(DEL_URL, {method: 'POST', body: fd, credentials: 'same-origin', headers: {'X-CSRF-Token': window.__MAC_ADMIN_CSRF__ || ''}})
                     .then(function (r) { return r.json(); })
                     .then(function (res) { layer.msg(res.msg); if (res.code === 1) { location.reload(); } });
             });
@@ -102,7 +104,7 @@
             var fd = new FormData();
             fd.append('channel', b.getAttribute('data-ch'));
             var load = layer.load(1);
-            fetch(TEST_URL, {method: 'POST', body: fd, credentials: 'same-origin'})
+            fetch(TEST_URL, {method: 'POST', body: fd, credentials: 'same-origin', headers: {'X-CSRF-Token': window.__MAC_ADMIN_CSRF__ || ''}})
                 .then(function (r) { return r.json(); })
                 .then(function (res) {
                     layer.close(load);
@@ -114,7 +116,7 @@
     });
 
     document.getElementById('enableRecommended').addEventListener('click', function () {
-        fetch(RECOMMEND_URL, {method: 'POST', credentials: 'same-origin'})
+        fetch(RECOMMEND_URL, {method: 'POST', credentials: 'same-origin', headers: {'X-CSRF-Token': window.__MAC_ADMIN_CSRF__ || ''}})
             .then(function (r) { return r.json(); })
             .then(function (res) { layer.msg(res.msg); if (res.code === 1) { location.reload(); } });
     });

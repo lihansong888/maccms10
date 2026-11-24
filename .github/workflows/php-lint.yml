@@ -38,3 +38,15 @@ jobs:
 
       - name: Regression test admin CSRF protection
         run: php tests/regression/admin_write_csrf.php
+
+      - name: Regression test collection SSRF protection
+        run: php tests/regression/collect_probe_safety.php
+
+      - name: Regression test API list limits
+        run: php tests/regression/api_num_clamp.php
+
+      - name: Regression test request-path database safety
+        run: php tests/regression/no_request_ddl.php
+
+      - name: Regression test user registration validation
+        run: php tests/regression/user_register_validate.php

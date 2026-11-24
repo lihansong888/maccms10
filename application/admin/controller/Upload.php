@@ -37,6 +37,9 @@ class Upload extends Base
 
     public function upload($p=[])
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
 		return model('Upload')->upload($p);
     }
 

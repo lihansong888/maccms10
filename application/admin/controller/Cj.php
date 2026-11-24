@@ -360,6 +360,9 @@ class Cj extends Base
 
     public function content_into($param=[])
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if(empty($param)){
             $param = input();
         }

@@ -34,7 +34,7 @@
                 <td>
                     <a class="layui-badge-rim j-clipboard" data-clipboard-target="#txt{$key}" href="javascript:;" title="{:lang('copy')}">{:lang('copy')}</a>
                     <a class="layui-badge-rim j-iframe" data-full="1" data-href="{:url('info')}?fpath={$vo.path}&fname={$vo.name}" href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del')}?fname={$vo.fullname}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-template-del" data-fname="{$vo.fullname}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}
@@ -65,18 +65,54 @@
         layer.full(index);
     }
 
+    function templateDelete(names, done)
+    {
+        var token = window.__MAC_ADMIN_CSRF__ || '';
+        if (!token) {
+            layer.msg('安全令牌缺失，请刷新页面后重试');
+            return;
+        }
+        $.post("{:url('template/del')}", {
+            fname: names,
+            __token__: token
+        }, function (res) {
+            layer.msg(res.msg || '请求完成');
+            if (res.code == 1 && typeof done === 'function') {
+                done();
+            }
+        }, 'json').fail(function () {
+            layer.msg('删除失败，请刷新页面后重试');
+        });
+    }
+
     function data_del(id)
     {
         if(!id){
             id  = checkIds('fname[]');
         }
+        if (!id) {
+            return;
+        }
         layer.confirm("{:lang('del_confirm')}", function (index) {
-            location.href = "{:url('template/del')}?fname=" + id;
+            templateDelete(id, function () { location.reload(); });
+            layer.close(index);
         });
     }
 
     $(function(){
-
+        $('.j-template-del').on('click', function () {
+            var that = $(this);
+            var name = that.attr('data-fname');
+            if (!name) {
+                return;
+            }
+            layer.confirm("{:lang('del_confirm')}", function (index) {
+                templateDelete(name, function () {
+                    that.closest('tr').remove();
+                });
+                layer.close(index);
+            });
+        });
     });
 </script>
 </body>

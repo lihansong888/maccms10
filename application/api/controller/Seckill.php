@@ -124,8 +124,11 @@ class Seckill extends Base
             return json(['code' => 1001, 'msg' => lang('param_err')]);
         }
 
-        $csrfErr = $this->checkCsrf();
-        if ($csrfErr !== null) return json($csrfErr);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $limited = $this->apiRateLimit('seckill_buy', $auth['user_id'], 20, 60);
         if ($limited !== true) {

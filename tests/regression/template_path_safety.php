@@ -16,6 +16,11 @@ rt_check(strpos($body, "=== '..'") !== false, 'parent traversal segments are rej
 rt_check(strpos($body, 'is_file($real)') !== false, 'existing targets must be regular files');
 rt_check(strpos($body, 'strpos($real, $prefix) !== 0') !== false, 'resolved symlink targets must remain under template root');
 
+$indexBody = isset($functions['index']) ? $functions['index']['body'] : '';
+rt_check(strpos($indexBody, 'realpath(ROOT_PATH . substr($pp, 2))') !== false, 'template browser resolves the real directory');
+rt_check(strpos($indexBody, "\$part === '..'") !== false, 'template browser rejects parent path segments');
+rt_check(strpos($indexBody, 'strpos($realDirectory, $templatePrefix) !== 0') !== false, 'template browser cannot list directories outside template root');
+
 $template = rt_bare($class);
 rt_same(false, rt_invoke($template, 'resolveTemplateFilePath', ['./template/../application/config.php', false]), 'single parent traversal rejected');
 rt_same(false, rt_invoke($template, 'resolveTemplateFilePath', ['./template/../../application/config.php', false]), 'multi-level parent traversal rejected');

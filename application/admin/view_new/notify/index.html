@@ -27,7 +27,7 @@
         <div class="flex gap-5 overflow-x-auto overflow-y-hidden">
             <a href="{:url('info')}" class="layui-btn"><i class="layui-icon">&#xe654;</i>{:lang('notify/admin_broadcast')}</a>
             <a data-href="{:url('del')}" class="layui-btn layui-btn-primary j-page-btns confirm"><i class="layui-icon">&#xe640;</i>{:lang('del')}</a>
-            <a data-href="{:url('del')}?ids=1&all=1" class="layui-btn layui-btn-primary j-ajax" confirm="{:lang('clear_confirm')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
+            <a data-href="{:url('del')}?ids=1&all=1" class="layui-btn layui-btn-primary j-ajax" data-method="post" confirm="{:lang('clear_confirm')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
         </div>
     </div>
 
@@ -58,7 +58,7 @@
                 </td>
                 <td>{$vo.notify_time|mac_day='color'}</td>
                 <td>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['notify_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['notify_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

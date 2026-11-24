@@ -124,44 +124,58 @@ class Card extends Base {
 
     public function useData($card_no,$card_pwd,$user_info)
     {
-        if (empty($card_no) || empty($card_pwd) || empty($user_info)) {
+        if (empty($card_no) || empty($card_pwd) || empty($user_info) || empty($user_info['user_id'])) {
             return ['code' => 1001, 'msg'=>lang('param_err')];
         }
 
-        $where=[];
-        $where['card_no'] = ['eq',$card_no];
-        $where['card_pwd'] = ['eq',$card_pwd];
-        //$where['card_sale_status'] = ['eq',1];
-        $where['card_use_status'] = ['eq',0];
+        $where = [];
+        $where['card_no'] = ['eq', $card_no];
+        $where['card_pwd'] = ['eq', $card_pwd];
+        $where['card_use_status'] = ['eq', 0];
 
         $info = $this->where($where)->find();
-        if(empty($info)){
-            return ['code' => 1002, 'msg' =>lang('model/card/not_found')];
+        if (empty($info)) {
+            return ['code' => 1002, 'msg' => lang('model/card/not_found')];
         }
 
-        $where2=[];
-        $where2['user_id'] = $user_info['user_id'];
-        $res = model('User')->where($where2)->setInc('user_points',$info['card_points']);
-        if($res===false){
-            return ['code' => 1003, 'msg' =>lang('model/card/update_user_points_err')];
-        }
-        //积分日志
-        $data = [];
-        $data['user_id'] = $user_info['user_id'];
-        $data['plog_type'] = 1;
-        $data['plog_points'] = $info['card_points'];
-        $result = model('Plog')->saveData($data);
+        Db::startTrans();
+        try {
+            // 先以「未使用」为条件原子占用卡密；并发请求中只能有一个请求更新成功
+            $consume = [];
+            $consume['card_sale_status'] = 1;
+            $consume['card_use_status'] = 1;
+            $consume['card_use_time'] = time();
+            $consume['user_id'] = intval($user_info['user_id']);
+            $affected = $this->where([
+                'card_id' => ['eq', intval($info['card_id'])],
+                'card_use_status' => ['eq', 0]
+            ])->update($consume);
 
-        $update=[];
-        $update['card_sale_status'] = 1;
-        $update['card_use_status'] = 1;
-        $update['card_use_time'] = time();
-        $update['user_id'] = $user_info['user_id'];
-        $res = $this->where($where)->update($update);
-        if($res === false){
-            return ['code' => 1004, 'msg' =>lang('model/card/update_card_status_err')];
-        }
+            if ($affected !== 1) {
+                Db::rollback();
+                return ['code' => 1002, 'msg' => lang('model/card/not_found')];
+            }
 
-        return ['code' => 1, 'msg' => lang('model/card/used_card_ok',[$info['card_points']])];
-    }
-}
+            $res = model('User')->where('user_id', intval($user_info['user_id']))->setInc('user_points', intval($info['card_points']));
+            if ($res === false || $res === 0) {
+                Db::rollback();
+                return ['code' => 1003, 'msg' => lang('model/card/update_user_points_err')];
+            }
+
+            $log = [];
+            $log['user_id'] = intval($user_info['user_id']);
+            $log['plog_type'] = 1;
+            $log['plog_points'] = intval($info['card_points']);
+            $result = model('Plog')->saveData($log);
+            if (empty($result) || intval($result['code']) > 1) {
+                Db::rollback();
+                return ['code' => 1003, 'msg' => lang('model/card/update_user_points_err')];
+            }
+
+            Db::commit();
+            return ['code' => 1, 'msg' => lang('model/card/used_card_ok', [$info['card_points']])];
+        } catch (\Exception $e) {
+            Db::rollback();
+            return ['code' => 1004, 'msg' => lang('model/card/update_card_status_err')];
+        }
+    }}

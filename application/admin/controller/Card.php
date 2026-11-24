@@ -78,6 +78,9 @@ class Card extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
 
             if(empty($param['num']) || empty($param['money']) || empty($param['point']) ){

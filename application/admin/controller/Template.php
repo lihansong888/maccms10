@@ -59,7 +59,7 @@ class Template extends Base
     public function index()
     {
         $param = input();
-        $path = $param['path'];
+        $path = isset($param['path']) && is_string($param['path']) ? $param['path'] : '';
         $path = str_replace('\\','',$path);
         $path = str_replace('/','',$path);
 

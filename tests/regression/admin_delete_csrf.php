@@ -76,7 +76,7 @@ foreach (['state','uninstall'] as $action) {
     if (isset($addon[$action])) {
         $body = $addon[$action]['body'];
         rt_check(strpos($body, 'isPost()') !== false, "[addon_csrf] {$action} requires POST");
-        rt_check(strpos($body, "Loader::validate('Token')") !== false, "[addon_csrf] {$action} validates token");
+        rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[addon_csrf] {$action} validates stable admin CSRF token");
     }
 }
 $addonView = file_get_contents(APP_PATH . 'admin/view_new/box/index.html');

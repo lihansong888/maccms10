@@ -9,8 +9,8 @@ require __DIR__ . '/lib/bootstrap.php';
 
 // ─── 列 forced_csrf：以下写接口必须在入口调用 $this->adminCsrfOk() ───
 $forced = [
-    'Admin'         => ['del'],
-    'Card'          => ['del'],
+    'Admin'         => ['del', 'field'],
+    'Card'          => ['del', 'info'],
     'Collect'       => ['del', 'healthtoggle'],
     'ResourceCheck' => ['enable', 'disable'],
     'Template'      => ['del'],

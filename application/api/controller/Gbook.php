@@ -3,10 +3,13 @@
 namespace app\api\controller;
 
 use think\Request;
+use app\common\util\CsrfGuard;
+use app\common\util\JwtService;
 
 class Gbook extends Base
 {
     use PublicApi;
+    use CsrfGuard;
     public function __construct()
     {
         parent::__construct();
@@ -117,6 +120,12 @@ class Gbook extends Base
         if ($GLOBALS['config']['gbook']['login'] == 1 && empty($authUser)) {
             return json(['code' => 1003, 'msg' => lang('index/require_login')]);
         }
+        // Cookie 登录会话提交留言时校验 CSRF；Bearer JWT 客户端不依赖浏览器会话 token。
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!empty($authUser) && !$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $data = [];
         $data['gbook_content'] = htmlentities(mac_filter_words($content));
@@ -144,6 +153,7 @@ class Gbook extends Base
      */
     public function report(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         $id = intval($request->param('id', 0));
         if ($id < 1) return json(['code' => 1001, 'msg' => '参数错误']);
         $cookie = 'gbook-report-' . $id;

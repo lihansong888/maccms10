@@ -1,10 +1,28 @@
 <?php
 namespace app\api\controller;
 use think\Request;
+use app\common\util\CsrfGuard;
 
 class Task extends Base
 {
     use PublicApi;
+    use CsrfGuard;
+
+    /**
+     * 所有会改变签到/奖励状态的入口统一要求 POST + CSRF；
+     * 已启用且校验通过的 Bearer JWT 客户端不依赖浏览器会话 token。
+     */
+    private function taskWriteGuard(Request $request)
+    {
+        if (!$request->isPost()) {
+            return ['code' => 1001, 'msg' => lang('param_err')];
+        }
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            return $this->checkCsrf();
+        }
+        return null;
+    }
 
     public function __construct()
     {
@@ -47,6 +65,9 @@ class Task extends Base
      */
     public function daily_sign(Request $request)
     {
+        $writeErr = $this->taskWriteGuard($request);
+        if ($writeErr !== null) return json($writeErr);
+
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) {
             return json(['code' => 1401, 'msg' => lang('task/login_required')]);
@@ -83,6 +104,9 @@ class Task extends Base
      */
     public function claim_sign_milestone(Request $request)
     {
+        $writeErr = $this->taskWriteGuard($request);
+        if ($writeErr !== null) return json($writeErr);
+
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) {
             return json(['code' => 1401, 'msg' => lang('task/login_required')]);
@@ -110,6 +134,9 @@ class Task extends Base
      */
     public function claim_reward(Request $request)
     {
+        $writeErr = $this->taskWriteGuard($request);
+        if ($writeErr !== null) return json($writeErr);
+
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) {
             return json(['code' => 1401, 'msg' => lang('task/login_required')]);
@@ -133,6 +160,9 @@ class Task extends Base
      */
     public function report_progress(Request $request)
     {
+        $writeErr = $this->taskWriteGuard($request);
+        if ($writeErr !== null) return json($writeErr);
+
         $check = model('User')->checkLogin();
         if ($check['code'] > 1) {
             return json(['code' => 1401, 'msg' => lang('task/login_required')]);

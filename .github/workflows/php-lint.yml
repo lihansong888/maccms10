@@ -50,3 +50,6 @@ jobs:
 
       - name: Regression test user registration validation
         run: php tests/regression/user_register_validate.php
+
+      - name: Regression test card redemption transactions
+        run: php tests/regression/card_redemption_transaction.php

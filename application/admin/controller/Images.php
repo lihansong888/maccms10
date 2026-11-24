@@ -47,6 +47,9 @@ class Images extends Base
 
     public function sync()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
 
         $param['page'] = intval($param['page']) < 1 ? 1 : $param['page'];

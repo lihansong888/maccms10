@@ -137,6 +137,35 @@
                 });
             }
 
+            // 原生 fetch 同样自动带令牌；覆盖 Monitor / ThemeDesign 等不走 jQuery 的后台请求。
+            if (typeof window.fetch === 'function' && typeof window.Headers === 'function'
+                && !window.__MAC_FETCH_CSRF_HOOKED__) {
+                window.__MAC_FETCH_CSRF_HOOKED__ = true;
+                var macOriginalFetch = window.fetch;
+                window.fetch = function (input, init) {
+                    init = init || {};
+                    var method = String(init.method || (input && input.method) || 'GET').toUpperCase();
+                    if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE') {
+                        var target = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
+                        var sameOrigin = false;
+                        try {
+                            sameOrigin = target !== '' && (new URL(target, window.location.href)).origin === window.location.origin;
+                        } catch (e) {}
+                        if (sameOrigin) {
+                            var sourceHeaders = init.headers || ((typeof Request !== 'undefined' && input instanceof Request) ? input.headers : undefined);
+                            var headers = new Headers(sourceHeaders || {});
+                            headers.set('X-CSRF-Token', t);
+                            init.headers = headers;
+                            if (typeof FormData !== 'undefined' && init.body instanceof FormData
+                                && !init.body.has('__token__')) {
+                                init.body.append('__token__', t);
+                            }
+                        }
+                    }
+                    return macOriginalFetch.call(this, input, init);
+                };
+            }
+
             function tryHook() {
                 if (typeof jQuery !== 'undefined') {
                     hookAjax(jQuery);

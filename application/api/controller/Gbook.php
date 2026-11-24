@@ -110,19 +110,25 @@ class Gbook extends Base
         if (empty($content)) return json(['code' => 1004, 'msg' => lang('index/require_content')]);
         $cookie = 'gbook_timespan';
         if (!empty(cookie($cookie))) return json(['code' => 1005, 'msg' => lang('frequently')]);
-        if ($GLOBALS['config']['gbook']['login'] == 1) {
-            $check = model('User')->checkLogin();
-            if ($check['code'] > 1) return json(['code' => 1003, 'msg' => lang('index/require_login')]);
+        // 只有 checkLogin 验证通过后才采用登录身份，不能直接信任 user_id Cookie。
+        $authUser = null;
+        $check = model('User')->checkLogin();
+        if (isset($check['code']) && intval($check['code']) === 1 && !empty($check['info']) && is_array($check['info'])) {
+            $authUser = $check['info'];
         }
+        if ($GLOBALS['config']['gbook']['login'] == 1 && empty($authUser)) {
+            return json(['code' => 1003, 'msg' => lang('index/require_login')]);
+        }
+
         $data = [];
         $data['gbook_content'] = htmlentities(mac_filter_words($content));
         $data['gbook_reply'] = '';
         $data['gbook_ip'] = mac_get_client_ip();
         $data['gbook_time'] = time();
-        if (!empty(cookie('user_id'))) {
-            $uinfo = model('User')->field('user_nick_name,user_name')->where(['user_id' => intval(cookie('user_id'))])->find();
-            $data['user_id'] = intval(cookie('user_id'));
-            $data['gbook_name'] = htmlentities($uinfo['user_nick_name'] ?: $uinfo['user_name']);
+        if (!empty($authUser)) {
+            $data['user_id'] = intval($authUser['user_id']);
+            $displayName = !empty($authUser['user_nick_name']) ? $authUser['user_nick_name'] : $authUser['user_name'];
+            $data['gbook_name'] = htmlentities($displayName);
         } else {
             $data['user_id'] = 0;
             $name = trim($request->param('gbook_name', ''));

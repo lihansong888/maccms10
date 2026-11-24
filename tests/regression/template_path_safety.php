@@ -21,4 +21,11 @@ rt_same(false, rt_invoke($template, 'resolveTemplateFilePath', ['./template/../a
 rt_same(false, rt_invoke($template, 'resolveTemplateFilePath', ['./template/../../application/config.php', false]), 'multi-level parent traversal rejected');
 rt_same(false, rt_invoke($template, 'resolveTemplateFilePath', ['/etc/passwd', false]), 'absolute paths rejected');
 
+$delete = isset($functions['del']) ? $functions['del']['body'] : '';
+rt_check(strpos($delete, 'Request()->isPost()') !== false, 'template deletion rejects GET');
+rt_check(strpos($delete, '$this->adminCsrfOk()') !== false, 'template deletion validates CSRF token');
+$view = file_get_contents(APP_PATH . 'admin/view_new/template/index.html');
+rt_check(strpos($view, 'j-tr-del" data-method="post"') !== false, 'template row deletion sends POST');
+rt_check(strpos($view, '$.post("{:url(\'template/del\')}"') !== false, 'template bulk deletion sends POST');
+
 rt_done('template path safety');

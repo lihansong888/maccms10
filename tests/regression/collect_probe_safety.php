@@ -11,6 +11,15 @@ use app\common\util\HttpClient;
 use app\common\util\ContentCheck;
 use app\common\util\CollectHealth;
 
+// 友链校验 URL 可由后台输入，必须走公网 IP + 逐跳校验通道。
+$commonFns = rt_functions(APP_PATH . 'common.php');
+rt_check(isset($commonFns['mac_check_back_link'])
+    && strpos($commonFns['mac_check_back_link']['body'], 'HttpClient::safeGet(') !== false,
+    '[ssrf_probe] mac_check_back_link must use HttpClient::safeGet for user-supplied URL');
+rt_check(isset($commonFns['mac_check_back_link'])
+    && strpos($commonFns['mac_check_back_link']['body'], 'mac_curl_get(') === false,
+    '[ssrf_probe] mac_check_back_link must not use redirect-following legacy curl helper');
+
 // ─── 列 ssrf_probe：探测「采集源下发的不可信地址」的工具，每个建 curl 句柄的函数都必须钉 IP、不自动跟随、限协议 ───
 // 登记：读取采集源 / 资源站中心下发地址并发起请求的工具文件。新增同类探测工具必须登记到这里。
 $probeFiles = [

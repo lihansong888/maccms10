@@ -198,6 +198,9 @@ class Task extends Base
     // 删除任务记录
     public function log_del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $all = $param['all'];

@@ -178,4 +178,5 @@ class Card extends Base {
             Db::rollback();
             return ['code' => 1004, 'msg' => lang('model/card/update_card_status_err')];
         }
-    }}
+    }
+}

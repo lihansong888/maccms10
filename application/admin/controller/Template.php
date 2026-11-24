@@ -237,6 +237,12 @@ class Template extends Base
             }
 
             $fcontent = isset($param['fcontent']) && is_string($param['fcontent']) ? $param['fcontent'] : '';
+            // ThinkPHP 标签允许 value/condition 等属性以冒号开头执行原始 PHP 表达式；
+            // 黑名单无法阻止 'sy'.'stem' 这类字符串拼接绕过，编辑器因此禁止标签属性中的直接表达式。
+            if (preg_match('/\\{[a-z][^}]*=\\s*([\\"\\'])\\s*:/is', $fcontent)) {
+                $this->error(lang('admin/template/php_safe_tip'));
+                return;
+            }
             $r = mac_reg_replace($fcontent,$filter,"*");
             if($fcontent !== $r){
                 $this->error(lang('admin/template/php_safe_tip'));

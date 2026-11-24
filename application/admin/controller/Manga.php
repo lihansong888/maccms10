@@ -363,6 +363,9 @@ class Manga extends Base
      */
     public function contentLangTranslate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -381,6 +384,9 @@ class Manga extends Base
 
     public function aiSeoGenerate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!Request()->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request'), 'data' => []]);
         }
@@ -402,6 +408,9 @@ class Manga extends Base
 
     public function restore()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $ids = $param['ids'];
         if (empty($ids)) {
@@ -417,6 +426,9 @@ class Manga extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $ids = $param['ids'];
         $purge = !empty($param['purge']);
@@ -451,6 +463,9 @@ class Manga extends Base
 
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -504,6 +519,9 @@ class Manga extends Base
 
     public function updateToday()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $flag = $param['flag'];
         $res = model('Manga')->updateToday($flag);
@@ -512,6 +530,9 @@ class Manga extends Base
 
     public function batchGenerateTag()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $ids = input('post.ids/a');
         if(empty($ids)){
             return json(['code'=>0,'msg'=>lang('admin/tag/select_manga_tag')]);

@@ -384,6 +384,9 @@ class Art extends Base
      */
     public function contentLangTranslate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -402,6 +405,9 @@ class Art extends Base
 
     public function aiSeoGenerate()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!Request()->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request'), 'data' => []]);
         }
@@ -423,6 +429,9 @@ class Art extends Base
 
     public function restore()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $ids = $param['ids'];
         if (empty($ids)) {
@@ -438,6 +447,9 @@ class Art extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $ids = $param['ids'];
         $purge = !empty($param['purge']);
@@ -472,6 +484,9 @@ class Art extends Base
 
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -525,6 +540,9 @@ class Art extends Base
 
     public function updateToday()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input();
         $flag = $param['flag'];
         $res = model('Art')->updateToday($flag);

@@ -27,6 +27,8 @@ jobs:
           php -l application/common/model/Actor.php
           php -l application/admin/controller/Cash.php
           php -l application/admin/controller/User.php
+          php -l application/admin/controller/Monitor.php
+          php -l application/admin/controller/Notify.php
           php -l application/index/controller/Comment.php
           php -l application/common/model/User.php
           php -l application/common/util/Collection.php

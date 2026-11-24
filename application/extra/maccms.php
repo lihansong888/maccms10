@@ -580,7 +580,7 @@ return array (
     'heightpop' => '600',
     'second' => '5',
     'prestrain' => '/static_new/player/prestrain.html',
-    'buffer' => '//union.maccms.la/html/buffer.html',
+    'buffer' => '/static_new/player/loading.html',
     'parse' => '',
     'autofull' => '0',
     'showtop' => '1',

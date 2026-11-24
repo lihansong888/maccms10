@@ -44,5 +44,7 @@ $apiGuestbook = rt_functions(APP_PATH . 'api/controller/Gbook.php');
 $apiGuestbookBody = isset($apiGuestbook['submit']) ? $apiGuestbook['submit']['body'] : '';
 rt_check(strpos($apiGuestbookBody, '$request->isPost()') !== false, 'guestbook API submit requires POST');
 rt_check(strpos($apiGuestbookBody, '$authUser[\'user_id\']') !== false, 'guestbook API uses verified user id');
+rt_same(false, strpos($guestbookBody, 'intval(cookie(\'user_id\'))') !== false, 'site guestbook never trusts raw user id cookie');
+rt_same(false, strpos($apiGuestbookBody, 'cookie(\'user_id\')') !== false, 'guestbook API never trusts raw user id cookie');
 
 rt_done('public comment mass assignment protection');

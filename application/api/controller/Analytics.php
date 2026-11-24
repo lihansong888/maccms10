@@ -23,7 +23,10 @@ class Analytics extends Base
             return $this->jsonError('session_key required');
         }
         $visitorId = $this->strVal($payload, 'visitor_id', 64);
-        $userId = intval(cookie('user_id'));
+        $login = model('User')->checkLogin();
+        $userId = (isset($login['code']) && intval($login['code']) === 1 && !empty($login['info']['user_id']))
+            ? intval($login['info']['user_id'])
+            : 0;
         $startedAt = $this->intVal($payload, 'started_at', time());
         $endedAt = $this->intVal($payload, 'ended_at', 0);
         $pageCount = max(0, $this->intVal($payload, 'page_count', 0));
@@ -75,7 +78,10 @@ class Analytics extends Base
         $ts = $this->intVal($payload, 'ts', time());
         $sessionId = $this->resolveSessionId($payload);
         $visitorId = $this->strVal($payload, 'visitor_id', 64);
-        $userId = intval(cookie('user_id'));
+        $login = model('User')->checkLogin();
+        $userId = (isset($login['code']) && intval($login['code']) === 1 && !empty($login['info']['user_id']))
+            ? intval($login['info']['user_id'])
+            : 0;
         $stayMs = max(0, $this->intVal($payload, 'stay_ms', 0));
         $mid = $this->intVal($payload, 'mid', 0);
         $rid = $this->intVal($payload, 'rid', 0);
@@ -132,7 +138,10 @@ class Analytics extends Base
         $ts = $this->intVal($payload, 'ts', time());
         $sessionId = $this->resolveSessionId($payload);
         $visitorId = $this->strVal($payload, 'visitor_id', 64);
-        $userId = intval(cookie('user_id'));
+        $login = model('User')->checkLogin();
+        $userId = (isset($login['code']) && intval($login['code']) === 1 && !empty($login['info']['user_id']))
+            ? intval($login['info']['user_id'])
+            : 0;
         $props = isset($payload['props']) ? $payload['props'] : [];
         if (!is_array($props)) {
             $props = [];

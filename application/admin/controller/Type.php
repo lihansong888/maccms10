@@ -146,6 +146,9 @@ class Type extends Base
      */
     public function contentLangTranslate()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -164,6 +167,9 @@ class Type extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -181,6 +187,9 @@ class Type extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -201,6 +210,9 @@ class Type extends Base
 
     public function batch()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         foreach ($ids as $k=>$id) {
@@ -312,6 +324,9 @@ class Type extends Base
 
     public function move()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $val = $param['val'];

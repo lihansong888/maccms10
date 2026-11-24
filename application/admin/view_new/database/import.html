@@ -34,7 +34,7 @@
                         {if condition="$upload_storage_ready"}
                         <a data-href="{:url('uploadStorage?id='.strtotime($key))}" class="layui-badge-rim layui-btn-small j-ajax" data-method="post" confirm="{:lang('admin/database/upload_storage_confirm')}">{:lang('admin/database/upload_storage_btn')}</a>
                         {/if}
-                        <a data-href="{:url('del?id='.strtotime($key))}" class="layui-badge-rim layui-btn-small j-tr-del">{:lang('del')}</a>
+                        <a data-href="{:url('del?id='.strtotime($key))}" class="layui-badge-rim layui-btn-small j-tr-del" data-method="post">{:lang('del')}</a>
                     </div>
                 </td>
             </tr>

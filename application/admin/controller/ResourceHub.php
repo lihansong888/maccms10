@@ -295,6 +295,9 @@ class ResourceHub extends Base
      */
     public function syncTypes()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $type_names = $param['type_names'] ?? [];
         $pid = intval($param['pid'] ?? 0);
@@ -377,6 +380,9 @@ class ResourceHub extends Base
      */
     public function autoBind()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $url = $param['url'] ?? '';
         $type = $param['type'] ?? '2';
@@ -607,6 +613,9 @@ class ResourceHub extends Base
      */
     public function autoPlayer()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $url = $param['url'] ?? '';
         $type = $param['type'] ?? '2';
@@ -877,6 +886,9 @@ MacPlayer.Show();
      */
     public function addToCollect()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!$this->request->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
@@ -926,6 +938,9 @@ MacPlayer.Show();
      */
     public function addTimming()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!$this->request->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
@@ -1004,6 +1019,9 @@ MacPlayer.Show();
      */
     public function quickCollect()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         // 强制 POST 请求，防止通过 GET 链接触发
         if (!$this->request->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
@@ -1148,6 +1166,9 @@ MacPlayer.Show();
      */
     public function addCustomSite()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!$this->request->isPost()) {
             return json(['code' => 0, 'msg' => lang('illegal_request')]);
         }
@@ -1188,6 +1209,9 @@ MacPlayer.Show();
      */
     public function delCustomSite()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $index = intval($param['index'] ?? -1);
 
@@ -1272,6 +1296,9 @@ MacPlayer.Show();
      */
     public function setRecommend()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         $param = input('post.');
         $ids = $param['ids'] ?? '';
         $level = intval($param['level'] ?? 9);
@@ -1380,6 +1407,9 @@ MacPlayer.Show();
      */
     public function cleanDuplicateTypes()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         // 支持 JSON body 和 form-data 两种提交方式
         $raw = file_get_contents('php://input');
         $param = json_decode($raw, true);

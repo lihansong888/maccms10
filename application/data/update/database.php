@@ -179,6 +179,8 @@ $innodb_tables = [
     $pre . 'order',
     $pre . 'user',
     $pre . 'plog',
+    $pre . 'card',
+    $pre . 'msg',
     $pre . 'group',
     $pre . 'coupon',
     $pre . 'coupon_user',

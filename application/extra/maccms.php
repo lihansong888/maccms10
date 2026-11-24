@@ -151,6 +151,8 @@ return array (
     'security_csp_policy' => '',
     'security_csp_report_uri' => '',
     'security_csrf_admin' => '0',
+    // 默认关闭模板在线写入/删除；确需使用时由管理员显式开启
+    'security_template_editor' => '0',
     'security_csrf_admin_exempt' => 'upload/*',
     'security_csrf_http_code' => '403',
     'api_jwt_enabled' => '0',

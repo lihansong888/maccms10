@@ -49,13 +49,15 @@ class Share extends Base
 
     public function record(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         $user = $this->_checkLoginForApi();
         if (!$user) {
             return json(['code' => 1010, 'msg' => lang('share/login_required')]);
         }
-        $csrfErr = $this->checkCsrf();
-        if ($csrfErr) {
-            return json($csrfErr);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr) return json($csrfErr);
         }
         if (!$this->_rateCheck('share_rate_' . $user['user_id'], 3)) {
             return json(['code' => 1003, 'msg' => lang('share/rate_limit')]);

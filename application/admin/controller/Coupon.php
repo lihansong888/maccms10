@@ -97,6 +97,9 @@ class Coupon extends Base
 
     public function save()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input('post.');
         $param['coupon_name'] = htmlspecialchars(urldecode(trim($param['coupon_name'] ?? '')));
         // datetime-local 转时间戳
@@ -134,6 +137,9 @@ class Coupon extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = isset($param['ids']) ? $param['ids'] : '';
         if (!empty($ids)) {
@@ -150,6 +156,9 @@ class Coupon extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         if (empty($param['ids']) || !isset($param['col']) || !isset($param['val'])) {
             return $this->error(lang('param_err'));

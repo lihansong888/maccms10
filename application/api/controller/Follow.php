@@ -81,9 +81,10 @@ class Follow extends Base
         if (!$user) {
             return json(['code' => 1010, 'msg' => lang('follow/login_required')]);
         }
-        $csrfErr = $this->checkCsrf();
-        if ($csrfErr) {
-            return json($csrfErr);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr) return json($csrfErr);
         }
         if (!$this->_rateCheck('unfollow_rate_' . $user['user_id'], 3)) {
             return json(['code' => 1003, 'msg' => lang('follow/rate_limit')]);

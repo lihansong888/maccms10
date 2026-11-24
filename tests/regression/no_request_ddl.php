@@ -52,15 +52,15 @@ $upd = file_get_contents(APP_PATH . 'data/update/database.php');
 $sql = file_get_contents(APP_PATH . 'install/sql/install.sql');
 
 // 卡密兑换和验证码消费依赖事务：新安装、旧库升级都必须使用 InnoDB。
-foreach (['card', 'msg', 'plog'] as $table) {
+foreach (['card', 'msg', 'plog', 'user'] as $table) {
     rt_check((bool)preg_match('/CREATE TABLE `mac_' . $table . '`[\\s\\S]*?ENGINE=InnoDB/i', $sql),
         "[transaction_engine] install.sql must create mac_{$table} with InnoDB");
 }
 $dbUpdate = file_get_contents(APP_PATH . 'data/update/database.php');
 $adminUpdate = file_get_contents(APP_PATH . 'admin/controller/Update.php');
-rt_check(strpos($dbUpdate, 'foreach ([\'card\', \'msg\', \'plog\'] as $transactionTable)') !== false
+rt_check(strpos($dbUpdate, 'foreach ([\'card\', \'msg\', \'plog\', \'user\'] as $transactionTable)') !== false
     && strpos($dbUpdate, 'ENGINE=InnoDB') !== false,
-    '[transaction_engine] database upgrade must migrate card/msg/plog to InnoDB');
+    '[transaction_engine] database upgrade must migrate card/msg/plog/user to InnoDB');
 rt_check(strpos($adminUpdate, 'information_schema.tables') !== false
     && strpos($adminUpdate, '$engine_list[') !== false,
     '[transaction_engine] update controller must provide current table engines to migration script');

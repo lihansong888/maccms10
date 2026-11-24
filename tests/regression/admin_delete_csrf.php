@@ -48,6 +48,26 @@ foreach (['Cash', 'Vod'] as $name) {
     }
 }
 
+$monitor = rt_functions(APP_PATH . 'admin/controller/Monitor.php');
+foreach (['rule_save','rule_del','rule_field','rule_enable_recommended','rule_test'] as $action) {
+    rt_check(isset($monitor[$action]), "[monitor_csrf] Monitor::{$action} exists");
+    if (isset($monitor[$action])) {
+        $body = $monitor[$action]['body'];
+        rt_check(strpos($body, 'Request()->isPost()') !== false, "[monitor_csrf] {$action} rejects GET");
+        rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[monitor_csrf] {$action} validates CSRF");
+    }
+}
+$monitorView = file_get_contents(APP_PATH . 'admin/view_new/monitor/rule.html');
+rt_check(strpos($monitorView, "X-CSRF-Token") !== false, '[monitor_csrf] fetch actions send token header');
+rt_check(strpos($monitorView, "fetch(DEL_URL, {method: 'POST'") !== false, '[monitor_csrf] rule deletion uses POST');
+
+$notify = rt_functions(APP_PATH . 'admin/controller/Notify.php');
+rt_check(isset($notify['broadcast']), '[notify_csrf] Notify::broadcast exists');
+if (isset($notify['broadcast'])) {
+    rt_check(strpos($notify['broadcast']['body'], 'Request()->isPost()') !== false, '[notify_csrf] broadcast rejects GET');
+    rt_check(strpos($notify['broadcast']['body'], '$this->adminCsrfOk()') !== false, '[notify_csrf] broadcast validates CSRF');
+}
+
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");

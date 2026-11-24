@@ -51,7 +51,7 @@
                 <td>
                     <a class="layui-badge-rim j-ajax" data-href="{:url('index/check_back_link')}?url={$vo['link_url']}" refresh="no" href="javascript:;" title="{:lang('detect')}">{:lang('detect')}</a>
                     <a class="layui-badge-rim j-iframe" data-href="{:url('info?id='.$vo['link_id'])}" href="javascript:;" title="{:lang('edit')}">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['link_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['link_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

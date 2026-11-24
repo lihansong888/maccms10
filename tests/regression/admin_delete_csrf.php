@@ -101,6 +101,17 @@ foreach ($extraActions as $controller => $actions) {
     }
 }
 
+$indexFunctions = rt_functions(APP_PATH . 'admin/controller/Index.php');
+rt_check(isset($indexFunctions['clear']), '[scheduler_csrf] Index::clear exists');
+if (isset($indexFunctions['clear'])) {
+    rt_check(strpos($indexFunctions['clear']['body'], '$isInternalTimming') !== false, '[scheduler_csrf] internal scheduled cache clear is preserved');
+}
+$timmingFunctions = rt_functions(APP_PATH . 'api/controller/Timming.php');
+rt_check(isset($timmingFunctions['cache']), '[scheduler_csrf] Timming::cache exists');
+if (isset($timmingFunctions['cache'])) {
+    rt_check(strpos($timmingFunctions['cache']['body'], '$request->clear()') !== false, '[scheduler_csrf] scheduled cache clear still calls Index::clear');
+}
+
 $cj = rt_functions(APP_PATH . 'admin/controller/Cj.php');
 foreach (['info','program','col_all','col_url','col_content','content_del','content_into','import'] as $action) {
     rt_check(isset($cj[$action]), "[cj_csrf] Cj::{$action} exists");

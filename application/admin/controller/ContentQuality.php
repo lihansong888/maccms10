@@ -121,6 +121,9 @@ class ContentQuality extends Base
      */
     public function markRecommend()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('param_err')]);
+        }
         $param = input('post.');
         if (!$this->checkAjaxToken($param)) {
             return json(['code' => 0, 'msg' => lang('param_err')]);

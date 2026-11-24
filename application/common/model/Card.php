@@ -124,44 +124,61 @@ class Card extends Base {
 
     public function useData($card_no,$card_pwd,$user_info)
     {
-        if (empty($card_no) || empty($card_pwd) || empty($user_info)) {
+        if (empty($card_no) || empty($card_pwd) || empty($user_info) || empty($user_info['user_id'])) {
             return ['code' => 1001, 'msg'=>lang('param_err')];
         }
 
-        $where=[];
-        $where['card_no'] = ['eq',$card_no];
-        $where['card_pwd'] = ['eq',$card_pwd];
-        //$where['card_sale_status'] = ['eq',1];
-        $where['card_use_status'] = ['eq',0];
+        $where = [];
+        $where['card_no'] = ['eq', $card_no];
+        $where['card_pwd'] = ['eq', $card_pwd];
+        $where['card_use_status'] = ['eq', 0];
+        $user_id = intval($user_info['user_id']);
 
-        $info = $this->where($where)->find();
-        if(empty($info)){
-            return ['code' => 1002, 'msg' =>lang('model/card/not_found')];
+        try {
+            return Db::transaction(function () use ($where, $user_id) {
+                // 先确认会员存在，再以「未使用」条件原子占用卡密，避免并发重复兑换。
+                $user = model('User')->where(['user_id' => $user_id])->find();
+                if (empty($user)) {
+                    return ['code' => 1003, 'msg' => lang('model/card/update_user_points_err')];
+                }
+
+                $info = $this->where($where)->find();
+                if (empty($info)) {
+                    return ['code' => 1002, 'msg' => lang('model/card/not_found')];
+                }
+
+                $update = [];
+                $update['card_sale_status'] = 1;
+                $update['card_use_status'] = 1;
+                $update['card_use_time'] = time();
+                $update['user_id'] = $user_id;
+                // UPDATE 会取得行锁；并发请求中只有一个请求能把状态 0 更新为 1。
+                $claimed = $this->where($where)->update($update);
+                if ($claimed != 1) {
+                    return ['code' => 1002, 'msg' => lang('model/card/not_found')];
+                }
+
+                if (intval($info['card_points']) > 0) {
+                    $res = model('User')->where(['user_id' => $user_id])->setInc('user_points', $info['card_points']);
+                    if ($res === false) {
+                        throw new \\RuntimeException('CARD_POINTS_UPDATE_FAILED');
+                    }
+                }
+
+                // 积分日志必须与卡密状态、会员积分处于同一事务。
+                $data = [];
+                $data['user_id'] = $user_id;
+                $data['plog_type'] = 1;
+                $data['plog_points'] = $info['card_points'];
+                $result = model('Plog')->saveData($data);
+                if (!is_array($result) || intval($result['code']) !== 1) {
+                    throw new \\RuntimeException('CARD_POINT_LOG_FAILED');
+                }
+
+                return ['code' => 1, 'msg' => lang('model/card/used_card_ok', [$info['card_points']])];
+            });
+        } catch (\\Exception $e) {
+            return ['code' => 1004, 'msg' => lang('model/card/update_card_status_err')];
         }
-
-        $where2=[];
-        $where2['user_id'] = $user_info['user_id'];
-        $res = model('User')->where($where2)->setInc('user_points',$info['card_points']);
-        if($res===false){
-            return ['code' => 1003, 'msg' =>lang('model/card/update_user_points_err')];
-        }
-        //积分日志
-        $data = [];
-        $data['user_id'] = $user_info['user_id'];
-        $data['plog_type'] = 1;
-        $data['plog_points'] = $info['card_points'];
-        $result = model('Plog')->saveData($data);
-
-        $update=[];
-        $update['card_sale_status'] = 1;
-        $update['card_use_status'] = 1;
-        $update['card_use_time'] = time();
-        $update['user_id'] = $user_info['user_id'];
-        $res = $this->where($where)->update($update);
-        if($res === false){
-            return ['code' => 1004, 'msg' =>lang('model/card/update_card_status_err')];
-        }
-
-        return ['code' => 1, 'msg' => lang('model/card/used_card_ok',[$info['card_points']])];
     }
 }

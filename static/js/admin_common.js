@@ -209,6 +209,14 @@ layui.define(['element', 'form'], function(exports) {
         form.render('checkbox');
     });
 
+    // 按按钮声明的 data-method 发送写请求；默认保持旧 GET 行为以兼容现有页面。
+    function macAdminActionRequest(url, data, method, callback) {
+        if (String(method || 'get').toLowerCase() === 'post') {
+            return $.post(url, data || {}, callback);
+        }
+        return $.get(url, data || {}, callback);
+    }
+
     /* 监听状态设置开关 */
     form.on('switch(switchStatus)', function(data) {
         var that = $(this), status = 0;
@@ -219,7 +227,7 @@ layui.define(['element', 'form'], function(exports) {
         if (this.checked) {
             status = 1;
         }
-        $.get(that.attr('data-href'), {val:status}, function(res) {
+        macAdminActionRequest(that.attr('data-href'), {val:status}, that.attr('data-method'), function(res) {
             layer.msg(res.msg);
             if (res.code == 0) {
                 that.trigger('click');
@@ -294,7 +302,7 @@ layui.define(['element', 'form'], function(exports) {
                 layer.msg('请设置data-href参数');
                 return false;
             }
-            $.get(href, function(res){
+            macAdminActionRequest(href, {}, that.attr('data-method'), function(res){
                 layer.msg(res.msg);
                 if (res.code == 1) {
                     that.parents('tr').remove();
@@ -318,7 +326,7 @@ layui.define(['element', 'form'], function(exports) {
 
         if (!that.attr('confirm')) {
             layer.msg('数据提交中...', {time:500000});
-            $.get(href, {}, function(res) {
+            macAdminActionRequest(href, {}, that.attr('data-method'), function(res) {
                 layer.msg(res.msg, {}, function() {
                     if (refresh == 'yes') {
                         if (typeof(res.url) != 'undefined' && res.url != null && res.url != '') {
@@ -334,7 +342,7 @@ layui.define(['element', 'form'], function(exports) {
         else {
             layer.confirm(that.attr('confirm'), {title:false, closeBtn:0}, function(index){
                 layer.msg('数据提交中...', {time:500000});
-                $.get(href, {}, function(res) {
+                macAdminActionRequest(href, {}, that.attr('data-method'), function(res) {
                     layer.msg(res.msg, {}, function() {
                         if (refresh == 'yes') {
                             if (typeof(res.url) != 'undefined' && res.url != null && res.url != '') {

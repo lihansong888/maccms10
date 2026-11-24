@@ -209,6 +209,22 @@ layui.define(['element', 'form'], function(exports) {
         form.render('checkbox');
     });
 
+    /* 列表状态快捷切换：统一使用 POST，后台通过 CSRF 校验 */
+    $(document).on('click', '.j-tr-field', function () {
+        var that = $(this), href = that.attr('data-href');
+        if (!href) {
+            layer.msg('请设置data-href参数');
+            return false;
+        }
+        $.post(href, {}, function (res) {
+            layer.msg(res.msg);
+            if (res.code == 1) {
+                location.reload();
+            }
+        }, 'json');
+        return false;
+    });
+
     /* 监听状态设置开关 */
     form.on('switch(switchStatus)', function(data) {
         var that = $(this), status = 0;
@@ -219,7 +235,7 @@ layui.define(['element', 'form'], function(exports) {
         if (this.checked) {
             status = 1;
         }
-        $.get(that.attr('data-href'), {val:status}, function(res) {
+        $.post(that.attr('data-href'), {val:status}, function(res) {
             layer.msg(res.msg);
             if (res.code == 0) {
                 that.trigger('click');
@@ -294,13 +310,15 @@ layui.define(['element', 'form'], function(exports) {
                 layer.msg('请设置data-href参数');
                 return false;
             }
-            $.get(href, function(res){
+            var method = (that.attr('data-method') || 'GET').toUpperCase();
+            var request = method === 'POST' ? $.post : $.get;
+            request(href, {}, function(res){
                 layer.msg(res.msg);
                 if (res.code == 1) {
                     that.parents('tr').remove();
                     that.parents('.tr').remove();
                 }
-            });
+            }, 'json');
             layer.close(index);
         });
         return false;
@@ -318,7 +336,9 @@ layui.define(['element', 'form'], function(exports) {
 
         if (!that.attr('confirm')) {
             layer.msg('数据提交中...', {time:500000});
-            $.get(href, {}, function(res) {
+            var method = (that.attr('data-method') || 'GET').toUpperCase();
+            var request = method === 'POST' ? $.post : $.get;
+            request(href, {}, function(res) {
                 layer.msg(res.msg, {}, function() {
                     if (refresh == 'yes') {
                         if (typeof(res.url) != 'undefined' && res.url != null && res.url != '') {

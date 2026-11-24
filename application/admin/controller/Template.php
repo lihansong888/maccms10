@@ -240,7 +240,10 @@ class Template extends Base
             }
             $a = str_replace('\\', '/', $a);
             $a = mac_convert_encoding($a, "UTF-8", "GB2312");
-            $target = realpath($a);
+            if (strpos($a, './template/') !== 0) {
+                continue;
+            }
+            $target = realpath(ROOT_PATH . substr($a, 2));
             if ($target === false || !is_file($target)) {
                 continue;
             }

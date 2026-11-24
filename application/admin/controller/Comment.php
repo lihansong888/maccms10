@@ -56,6 +56,9 @@ class Comment extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input();
             $res = model('Comment')->saveData($param);
             if($res['code']>1){
@@ -76,6 +79,9 @@ class Comment extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $all = $param['all'];
@@ -97,6 +103,9 @@ class Comment extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];
@@ -139,6 +148,9 @@ class Comment extends Base
     public function blacklist()
     {
         if ($this->request->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $keywords = $this->request->post('keywords');
             // 按行分割关键字
             $keywords_array = array_filter(explode("\n", $keywords));
@@ -163,6 +175,9 @@ class Comment extends Base
     public function blacklist_ip()
     {
         if ($this->request->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $keywords = $this->request->post('ip');
             // 按行分割关键字
             $keywords_array = array_filter(explode("\n", $keywords));

@@ -4,10 +4,13 @@ namespace app\api\controller;
 
 use think\Db;
 use think\Request;
+use app\common\util\CsrfGuard;
+use app\common\util\JwtService;
 
 class Comment extends Base
 {
     use PublicApi;
+    use CsrfGuard;
     public function __construct()
     {
         parent::__construct();
@@ -149,6 +152,12 @@ class Comment extends Base
         }
         if ($GLOBALS['config']['comment']['login'] == 1 && empty($authUser)) {
             return json(['code' => 1003, 'msg' => lang('index/require_login')]);
+        }
+        // Cookie 登录会话提交评论时校验 CSRF；Bearer JWT 客户端不依赖浏览器会话 token。
+        $viaBearer = JwtService::bearerFromRequest() !== '' && JwtService::isEnabled();
+        if (!empty($authUser) && !$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
         }
 
         $data = [];

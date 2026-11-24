@@ -161,4 +161,39 @@ $collectView = file_get_contents(APP_PATH . 'admin/view_new/collect/index.html')
 rt_check(strpos($collectView, "class=\"layui-badge-rim j-tr-del\" data-method=\"post\"") !== false,
     '[forced_csrf_ui] collection deletion must use POST');
 
+// 这些列表页的行删除/清空按钮必须走 POST，避免后端加固后前端仍发 GET。
+foreach ([
+    'actor/index.html',
+    'chatroom/index.html',
+    'danmaku/index.html',
+    'dynamics/index.html',
+    'follow/index.html',
+    'gbook/index.html',
+    'link/index.html',
+    'mall_goods/index.html',
+    'role/index.html',
+    'share_log/index.html',
+    'sign_milestone/index.html',
+    'topic/index.html',
+    'ulog/index.html',
+    'visit/index.html',
+    'website/index.html',
+    'domain/index.html',
+    'art/index.html',
+    'manga/index.html',
+] as $view) {
+    $html = (string)@file_get_contents(APP_PATH . 'admin/view_new/' . $view);
+    rt_check(strpos($html, 'j-tr-del') === false || strpos($html, 'data-method="post"') !== false,
+        "[forced_csrf_ui] {$view}: row delete must submit POST");
+}
+$meiliView = (string)@file_get_contents(APP_PATH . 'admin/view_new/meilisearch/index.html');
+rt_check(strpos($meiliView, "input[name=\\"__token__\\"]") !== false,
+    '[forced_csrf_ui] Meilisearch setup must submit the page CSRF token');
+$meiliSyncView = (string)@file_get_contents(APP_PATH . 'admin/view_new/meilisearch/sync.html');
+rt_check(strpos($meiliSyncView, 'mac_admin_csrf_token()') !== false,
+    '[forced_csrf_ui] Meilisearch full sync must submit the page CSRF token');
+$collectInfoView = (string)@file_get_contents(APP_PATH . 'admin/view_new/collect/info.html');
+rt_check(strpos($collectInfoView, "__token__=") !== false,
+    '[forced_csrf_ui] collection source test must submit the page CSRF token');
+
 rt_done('admin write endpoints forced CSRF');

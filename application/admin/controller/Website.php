@@ -198,6 +198,9 @@ class Website extends Base
 
     public function info()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (Request()->isPost()) {
             if (!$this->adminCsrfOk()) {
                 return $this->error(lang('token_err'));
@@ -261,6 +264,9 @@ class Website extends Base
     public function contentLangTranslate()
     {
         if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
             return $this->error(lang('illegal_request'));
         }
         $text = (string)input('post.text', '');
@@ -281,6 +287,9 @@ class Website extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return $this->error(lang('illegal_request'));
         }
@@ -313,6 +322,9 @@ class Website extends Base
 
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return $this->error(lang('illegal_request'));
         }
@@ -369,6 +381,9 @@ class Website extends Base
 
     public function updateToday()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
         if (!request()->isPost() || !$this->adminCsrfOk()) {
             return $this->error(lang('illegal_request'));
         }

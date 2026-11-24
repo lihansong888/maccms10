@@ -254,6 +254,9 @@ class Database extends Base
 
     public function repair($ids = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($ids)) {
             return $this->error(lang('admin/database/select_repair_table'));
         }

@@ -48,7 +48,7 @@
                 <td>{$vo['Data_free']/1024|round=###,2} kb</td>
                 <td>{$vo['Comment']}</td>
                 <td>
-                        <a data-href="{:url('optimize?ids='.$vo['Name'])}" class="layui-badge-rim j-ajax">{:lang('admin/database/optimize')}</a>
+                        <a data-href="{:url('optimize?ids='.$vo['Name'])}" class="layui-badge-rim j-ajax" data-method="post">{:lang('admin/database/optimize')}</a>
                         <a data-href="{:url('repair?ids='.$vo['Name'])}" class="layui-badge-rim  j-ajax">{:lang('admin/database/repair')}</a>
                 </td>
             </tr>

@@ -181,6 +181,9 @@ class Database extends Base
      */
     public function import($id = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         if (empty($id)) {
             return $this->error(lang('admin/database/select_file'));
         }

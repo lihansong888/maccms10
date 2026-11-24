@@ -39,6 +39,9 @@ class SignMilestone extends Base
     public function info()
     {
         if (request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('param_err'));
+            }
             $param = input();
             $res = model('SignMilestone')->saveData($param);
             if ($res['code'] > 1) {
@@ -65,6 +68,9 @@ class SignMilestone extends Base
     // 删除里程碑
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         if (!empty($ids)) {
@@ -82,6 +88,9 @@ class SignMilestone extends Base
     // 修改状态
     public function field()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

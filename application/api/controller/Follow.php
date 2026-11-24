@@ -49,13 +49,15 @@ class Follow extends Base
 
     public function follow(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         $user = $this->_checkLoginForApi();
         if (!$user) {
             return json(['code' => 1010, 'msg' => lang('follow/login_required')]);
         }
-        $csrfErr = $this->checkCsrf();
-        if ($csrfErr) {
-            return json($csrfErr);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr) return json($csrfErr);
         }
         if (!$this->_rateCheck('follow_rate_' . $user['user_id'], 3)) {
             return json(['code' => 1003, 'msg' => lang('follow/rate_limit')]);
@@ -74,6 +76,7 @@ class Follow extends Base
 
     public function unfollow(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         $user = $this->_checkLoginForApi();
         if (!$user) {
             return json(['code' => 1010, 'msg' => lang('follow/login_required')]);

@@ -21,7 +21,7 @@ class Image extends Base {
             $ext = 'jpg';
         }
         // 远程图片来自采集源等第三方主机，可能自签/过期/域名不匹配，显式关闭校验以保兼容。
-        $img = mac_curl_get($url, [], '', false);
+        $img = \app\common\util\HttpClient::safeGet($url, 30, false);
         if (empty($img) || strlen($img) < 10) {
             return $url . '#err';
         }

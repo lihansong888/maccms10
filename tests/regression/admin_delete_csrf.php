@@ -23,6 +23,31 @@ foreach ($controllers as $name) {
     }
 }
 
+$fieldControllers = [
+    'Task','Live','Role','Type','User','Actor','Group','Gbook','Topic','Admin','Follow','Notify',
+    'UserPm','Coupon','Website','Comment','Danmaku','Seckill','Timming','Chatroom','MallGoods',
+    'Voddowner','Vodplayer','Vodserver','VodAuditRule','SignMilestone','Art','Manga','Vod',
+];
+foreach ($fieldControllers as $name) {
+    $functions = rt_functions(APP_PATH . "admin/controller/{$name}.php");
+    rt_check(isset($functions['field']), "[field_csrf] {$name}::field exists");
+    if (isset($functions['field'])) {
+        $body = $functions['field']['body'];
+        rt_check(strpos($body, 'Request()->isPost()') !== false, "[field_csrf] {$name}::field rejects GET");
+        rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[field_csrf] {$name}::field validates CSRF");
+    }
+}
+
+foreach (['Cash', 'Vod'] as $name) {
+    $functions = rt_functions(APP_PATH . "admin/controller/{$name}.php");
+    rt_check(isset($functions['audit']), "[audit_csrf] {$name}::audit exists");
+    if (isset($functions['audit'])) {
+        $body = $functions['audit']['body'];
+        rt_check(strpos($body, 'Request()->isPost()') !== false, "[audit_csrf] {$name}::audit rejects GET");
+        rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[audit_csrf] {$name}::audit validates CSRF");
+    }
+}
+
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");

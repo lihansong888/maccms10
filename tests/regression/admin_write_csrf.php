@@ -12,7 +12,11 @@ $forced = [
     'Admin'         => ['del', 'field'],
     'Card'          => ['del', 'info'],
     'Collect'       => ['del', 'healthtoggle'],
+    'Coupon'        => ['save', 'del', 'field'],
+    'Group'         => ['info', 'del', 'field'],
+    'Order'         => ['del'],
     'ResourceCheck' => ['enable', 'disable'],
+    'Seckill'       => ['save', 'del', 'field'],
     'Template'      => ['del'],
 ];
 foreach ($forced as $cls => $fns) {

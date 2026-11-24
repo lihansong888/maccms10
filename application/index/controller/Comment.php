@@ -78,14 +78,14 @@ class Comment extends Base
             }
         }
 
-        if($GLOBALS['config']['comment']['login'] ==1){
-            if(empty(cookie('user_id'))){
-                return ['code' => 1003, 'msg' =>lang('index/require_login')];
-            }
-            $res = model('User')->checkLogin();
-            if($res['code']>1) {
-                return ['code' => 1003, 'msg' => lang('index/require_login')];
-            }
+        // 始终验证登录身份；不能因登录非必需就信任客户端可伪造的 user_id Cookie。
+        $authUser = null;
+        $authResult = model('User')->checkLogin();
+        if (isset($authResult['code']) && intval($authResult['code']) === 1 && !empty($authResult['info'])) {
+            $authUser = $authResult['info'];
+        }
+        if ($GLOBALS['config']['comment']['login'] == 1 && empty($authUser)) {
+            return ['code' => 1003, 'msg' => lang('index/require_login')];
         }
 
         if(empty($param['comment_content'])){
@@ -106,17 +106,12 @@ class Comment extends Base
             return ['code'=>1006,'msg'=>lang('index/mid_err')];
         }
 
-        if(empty(cookie('user_id'))){
+        if (empty($authUser)) {
             $param['user_id'] = 0;
             $param['comment_name'] = lang('controller/visitor');
-        }
-        else{
-            $param['comment_name'] = cookie('user_name');
-            $param['user_id'] = intval(cookie('user_id'));
-            $user_data = model('User')->field('user_nick_name')->where(['user_id' => $param['user_id']])->find();
-            if (!empty($user_data['user_nick_name'])) {
-                $param['comment_name'] = $user_data['user_nick_name'];
-            }
+        } else {
+            $param['user_id'] = intval($authUser['user_id']);
+            $param['comment_name'] = !empty($authUser['user_nick_name']) ? $authUser['user_nick_name'] : $authUser['user_name'];
         }
         $param['comment_name'] = htmlentities(trim($param['comment_name']));
         $param['comment_rid'] = intval($param['comment_rid']);

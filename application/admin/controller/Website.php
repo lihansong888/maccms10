@@ -198,9 +198,6 @@ class Website extends Base
 
     public function info()
     {
-        if (!request()->isPost() || !$this->adminCsrfOk()) {
-            return json(['code' => 0, 'msg' => lang('illegal_request')]);
-        }
         if (Request()->isPost()) {
             if (!$this->adminCsrfOk()) {
                 return $this->error(lang('token_err'));

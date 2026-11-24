@@ -82,6 +82,7 @@
 
         upload.render({
             elem: '.layui-upload'
+            ,data: { __token__: window.__MAC_ADMIN_CSRF__ || '' }
             ,url: "{:url('domain/import')}"
             ,method: 'post'
             ,exts:'txt'

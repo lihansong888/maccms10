@@ -50,6 +50,9 @@ class VodAuditRule extends Base
     public function info()
     {
         if (request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
             $res = model('VodAuditRule')->saveData($param);
             if ($res['code'] > 1) {
@@ -82,6 +85,9 @@ class VodAuditRule extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         if (empty($ids)) {
@@ -97,6 +103,9 @@ class VodAuditRule extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         $col = $param['col'] ?? '';

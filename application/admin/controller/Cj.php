@@ -326,6 +326,9 @@ class Cj extends Base
 
     public function content_del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $all = $param['all'];

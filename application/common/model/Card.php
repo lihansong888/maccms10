@@ -174,7 +174,7 @@ class Card extends Base {
 
             Db::commit();
             return ['code' => 1, 'msg' => lang('model/card/used_card_ok', [$info['card_points']])];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             return ['code' => 1004, 'msg' => lang('model/card/update_card_status_err')];
         }

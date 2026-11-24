@@ -1083,7 +1083,7 @@ function mac_check_back_link($url)
     $site_url = $GLOBALS['config']['site']['site_url'];
     $site_wapurl = $GLOBALS['config']['site']['site_wapurl'];
     // 友链校验目标为用户填写的第三方站点，可能自签/过期/域名不匹配，显式关闭校验以保兼容。
-    $html = mac_curl_get($url, [], '', false);
+    $html = \app\common\util\HttpClient::safeGet($url, 15, false);
     $msg = '';
     $code = 1;
 

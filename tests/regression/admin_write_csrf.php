@@ -70,6 +70,22 @@ rt_check(isset($update['updateCsrfOk'])
     && strpos($update['updateCsrfOk']['body'], 'CsrfGuard::tokenAccepted(') !== false,
     '[updater_csrf] Update::updateCsrfOk must delegate to CsrfGuard');
 
+// 文件删除接口必须先 realpath，再确认目标仍在允许目录内。
+$images = rt_functions(APP_PATH . 'admin/controller/Images.php');
+if (isset($images['del'])) {
+    rt_check(strpos($images['del']['body'], "realpath(ROOT_PATH . 'upload')") !== false,
+        '[upload_delete] Images::del must resolve upload root');
+    rt_check(strpos($images['del']['body'], 'strpos($target, $prefix)') !== false,
+        '[upload_delete] Images::del must enforce upload directory boundary');
+}
+$template = rt_functions(APP_PATH . 'admin/controller/Template.php');
+if (isset($template['del'])) {
+    rt_check(strpos($template['del']['body'], 'realpath(ROOT_PATH . substr($a, 2))') !== false,
+        '[template_delete] Template::del must resolve target path');
+    rt_check(strpos($template['del']['body'], 'strpos($target, $prefix)') !== false,
+        '[template_delete] Template::del must enforce template directory boundary');
+}
+
 // Base::adminCsrfOk 必须走与 CsrfGuard 相同的判定，且不读全局开关
 $base = rt_functions(APP_PATH . 'admin/controller/Base.php');
 rt_check(isset($base['adminCsrfOk']), '[forced_csrf] Base::adminCsrfOk missing');

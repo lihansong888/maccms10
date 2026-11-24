@@ -1487,7 +1487,7 @@ class User extends Base
             Db::commit();
             Cache::rm($attemptKey);
             return ['code'=>1,'msg'=>lang('model/user/pass_reset_ok')];
-        } catch (\\Throwable $e) {
+        } catch (\Throwable $e) {
             Db::rollback();
             return ['code'=>2009,'msg'=>lang('model/user/pass_reset_err')];
         }

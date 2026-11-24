@@ -76,6 +76,9 @@ class Domain extends Base
 
     public function del()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         if(!empty($param['ids'])){
             $list = config('domain');
@@ -103,6 +106,9 @@ class Domain extends Base
 
     public function import()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $file = $this->request->file('file');
         $info = $file->rule('uniqid')->validate(['size' => 10240000, 'ext' => 'txt']);
         if ($info) {

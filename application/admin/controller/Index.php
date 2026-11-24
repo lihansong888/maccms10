@@ -225,6 +225,9 @@ class Index extends Base
 
     public function check_back_link()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $param = input();
         $res = mac_check_back_link($param['url']);
         return json($res);

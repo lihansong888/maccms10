@@ -211,6 +211,9 @@ class User extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->ajaxErrorWithFreshToken(lang('token_err'));
+            }
             $param = input('post.');
             if(isset($param['group_id']) && is_array($param['group_id'])) {
                 $param['group_id'] = implode(',', $param['group_id']);
@@ -299,6 +302,9 @@ class User extends Base
 
     public function generateInviteCode()
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('illegal_request'));
+        }
         $count = 0;
         $model = model('User');
         

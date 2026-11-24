@@ -82,6 +82,25 @@ foreach (['state','uninstall'] as $action) {
 $addonView = file_get_contents(APP_PATH . 'admin/view_new/box/index.html');
 rt_check(substr_count($addonView, "type: 'post'") >= 2, '[addon_csrf] addon state and uninstall use POST');
 
+$extraActions = [
+    'Index' => ['clear','check_back_link'],
+    'Database' => ['uploadStorage','import','optimize','repair'],
+    'Task' => ['log_del'],
+    'User' => ['generateInviteCode'],
+    'Cj' => ['content_del','content_into'],
+];
+foreach ($extraActions as $controller => $actions) {
+    $functions = rt_functions(APP_PATH . "admin/controller/{$controller}.php");
+    foreach ($actions as $action) {
+        rt_check(isset($functions[$action]), "[write_csrf] {$controller}::{$action} exists");
+        if (isset($functions[$action])) {
+            $body = $functions[$action]['body'];
+            rt_check(strpos($body, 'Request()->isPost()') !== false, "[write_csrf] {$controller}::{$action} rejects GET");
+            rt_check(strpos($body, '$this->adminCsrfOk()') !== false, "[write_csrf] {$controller}::{$action} validates CSRF");
+        }
+    }
+}
+
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);
     rt_check(strpos($js, "String(method || 'post')") !== false, "[delete_csrf] {$path} defaults admin AJAX actions to POST");

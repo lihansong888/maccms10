@@ -72,7 +72,7 @@
                 <td>{$vo.user_id}、{$vo.user.user_name}</td>
                 <td>{if condition="$vo.card_use_time eq 0"} {else}{$vo.card_use_time|mac_day='color'}{/if}</td>
                 <td>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['card_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['card_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

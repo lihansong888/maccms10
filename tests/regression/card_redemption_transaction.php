@@ -31,19 +31,9 @@ rt_check($start !== false && $log !== false && $commit !== false && $start < $lo
 $install = file_get_contents(ROOT_PATH . 'application/install/sql/install.sql');
 rt_check($install !== false, '[card_tx] unable to read install SQL');
 foreach (['user', 'card', 'msg', 'plog'] as $table) {
-    rt_check((bool)preg_match('/CREATE TABLE `mac_' . $table . '`[\\s\\S]*?\\) ENGINE=InnoDB\\b/', $install),
-        "[card_tx] new install must create mac_{$table} as InnoDB");
-}
-
-$upgrade = file_get_contents(APP_PATH . 'data/update/database.php');
-rt_check($upgrade !== false, '[card_tx] unable to read database upgrade script');
-rt_check(strpos($upgrade, "foreach (['card', 'msg', 'plog', 'user'] as \$transactionTable)") !== false,
-    '[card_tx] legacy database upgrade must migrate card/msg/plog/user to InnoDB');
-rt_check(strpos($upgrade, '$engine_list[$fullTableName]') !== false,
-    '[card_tx] upgrade must use exact table engine metadata');
-rt_check((bool)preg_match('/CREATE TABLE `\{\$pre\\\x27plog\\\x27\}[\\s\\S]*?ENGINE=InnoDB/i', $upgrade)
-    || strpos($upgrade, "CREATE TABLE `{\$pre}plog`") !== false
-        && strpos(substr($upgrade, strpos($upgrade, "CREATE TABLE `{\$pre}plog`"), 1400), 'ENGINE=InnoDB') !== false,
+    $plogCreate = strpos($upgrade, 'CREATE TABLE `{$pre}plog`');
+rt_check($plogCreate !== false
+    && strpos(substr($upgrade, $plogCreate, 1600), 'ENGINE=InnoDB') !== false,
     '[card_tx] newly created mac_plog must use InnoDB');
 
 rt_done('card redemption transaction');

@@ -15,6 +15,6 @@ rt_check(strpos($body, '$claimed != 1') !== false, 'conditional card claim rejec
 rt_check(strpos($body, "setInc('user_points'") !== false, 'points are credited inside the transaction');
 rt_check(strpos($body, "model('Plog')->saveData($data)") !== false, 'points log is written inside the transaction');
 rt_check(strpos($body, 'CARD_POINT_LOG_FAILED') !== false, 'points log failure rolls back the transaction');
-rt_check(strpos($body, 'catch (\\\\Exception $e)') !== false, 'transaction failures are handled');
+rt_check(strpos($body, 'catch (\\Exception $e)') !== false, 'transaction failures are handled');
 
 rt_done('card redemption transaction');

@@ -2942,8 +2942,22 @@ class Collect extends Base {
      */
     private function checkCjUrl($url)
     {
-        $result = parse_url($url);
-        if (empty($result['host']) || in_array($result['host'], ['127.0.0.1', 'localhost'])) {
+        // 采集源只允许 HTTP/HTTPS 公网地址；拒绝 userinfo、非法端口及本机/内网/保留地址。
+        // 实际请求仍由 HttpClient::safeGet() 再次校验并通过 CURLOPT_RESOLVE 固定公网 IP，
+        // 避免 DNS rebinding 和重定向绕过。这里提前拒绝不合规地址，避免进入采集流程。
+        $result = @parse_url((string)$url);
+        if (!is_array($result)
+            || empty($result['scheme'])
+            || !in_array(strtolower($result['scheme']), ['http', 'https'], true)
+            || empty($result['host'])
+            || isset($result['user'])
+            || isset($result['pass'])
+            || (isset($result['port']) && ($result['port'] < 1 || $result['port'] > 65535))) {
+            return ['code' => 1001, 'msg' => lang('model/collect/cjurl_err') . ': ' . $url];
+        }
+
+        $reason = '';
+        if (HttpClient::resolvePublicIp($result['host'], $reason) === '') {
             return ['code' => 1001, 'msg' => lang('model/collect/cjurl_err') . ': ' . $url];
         }
         return ['code' => 1];

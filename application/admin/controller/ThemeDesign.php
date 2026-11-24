@@ -3268,8 +3268,8 @@ class ThemeDesign extends Base
      */
     public function save_step()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $param = input('post.');
         $step = isset($param['step']) ? trim($param['step']) : '';
@@ -3488,6 +3488,9 @@ class ThemeDesign extends Base
     /** 预览：刷新草稿产物并返回带 td_preview 标记的页面 URL */
     public function preview()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
+        }
         $cfg = $this->currentDraft();
         // 确保草稿已落盘（首次预览也能生效）
         if (!is_file($this->draftFile())) {
@@ -3508,8 +3511,8 @@ class ThemeDesign extends Base
      */
     public function init_page()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $route = PageRegistry::normalizeRoute(input('route', ''));
         if ($route === '' || !PageRegistry::isEditableRoute($route)
@@ -3572,8 +3575,8 @@ class ThemeDesign extends Base
      */
     public function publish()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $cfg = $this->readJson($this->draftFile());
         if (!is_array($cfg)) {
@@ -3637,8 +3640,8 @@ class ThemeDesign extends Base
      */
     public function create_from_preset()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $presetId = ThemePreset::normalizeId(input('post.preset_id', ''));
         $dir = strtolower(trim((string)input('post.new_dir', '')));
@@ -3734,8 +3737,8 @@ class ThemeDesign extends Base
      */
     public function activate_site_theme()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $dir = strtolower(trim((string) input('post.theme_dir', '')));
         if (!preg_match('/^[a-z][a-z0-9_-]{1,31}$/', $dir)) {
@@ -3963,8 +3966,8 @@ class ThemeDesign extends Base
      */
     public function rollback()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $ts = (int)input('post.ts/d', 0);
         if ($ts <= 0) {
@@ -3990,6 +3993,9 @@ class ThemeDesign extends Base
     /** 图片上传（logo / default_avatar），复用 Upload 模型 */
     public function upload()
     {
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
+        }
         $res = model('Upload')->upload(array('input' => 'file', 'flag' => 'images'));
         // 后台(ENTRANCE=admin)下 Upload 返回 {code,msg,data:{file}}，前端读取 res.file，这里统一归一化为顶层 file 并补全为可用 URL
         $file = '';
@@ -5284,8 +5290,8 @@ class ThemeDesign extends Base
      */
     public function generate()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         // 每管理员限流（外部 AI 调用，防刷）
         $adminId = intval(isset($this->_admin['admin_id']) ? $this->_admin['admin_id'] : 0);
@@ -5366,8 +5372,8 @@ class ThemeDesign extends Base
      */
     public function detect()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         // 每管理员限流（外部 AI 调用，防刷）
         $adminId = intval(isset($this->_admin['admin_id']) ? $this->_admin['admin_id'] : 0);
@@ -5444,8 +5450,8 @@ class ThemeDesign extends Base
      */
     public function generate_apply()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $colors = json_decode((string)input('post.colors', ''), true);
         if (!is_array($colors)) {
@@ -5851,8 +5857,8 @@ class ThemeDesign extends Base
      */
     public function gen_image()
     {
-        if (!$this->request->isPost()) {
-            return json(array('code' => 0, 'msg' => lang('illegal_request')));
+        if (!$this->request->isPost() || !$this->adminCsrfOk()) {
+            return json(array('code' => 0, 'msg' => lang('token_err')));
         }
         $kind = strtolower(trim((string)input('post.kind', '')));
         if (!in_array($kind, array('logo', 'avatar'), true)) {

@@ -115,6 +115,7 @@ foreach (['info','col_all','col_url','col_content','content_del','content_into',
 $cjView = file_get_contents(APP_PATH . 'admin/view_new/cj/index.html');
 rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_url\')') !== false, '[cj_csrf] URL collection iframe uses POST');
 rt_check(strpos($cjView, 'j-iframe" data-method="post" data-href="{:url(\'col_content\')') !== false, '[cj_csrf] content collection iframe uses POST');
+rt_check(strpos($cjView, "data: {__token__: window.__MAC_ADMIN_CSRF__") !== false, '[cj_csrf] rule import upload sends CSRF token');
 
 foreach (['static/js/admin_common.js', 'static_new/js/admin_common.js'] as $path) {
     $js = file_get_contents(ROOT_PATH . $path);

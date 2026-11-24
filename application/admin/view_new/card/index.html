@@ -38,7 +38,7 @@
         <div class="flex gap-5 overflow-x-auto overflow-y-hidden">
             <a data-href="{:url('info')}" class="layui-btn layui-btn-primary j-iframe" data-width="600px" data-height="400px"><i class="layui-icon">&#xe654;</i>{:lang('add')}</a>
             <a data-href="{:url('del')}" class="layui-btn layui-btn-primary j-page-btns confirm"><i class="layui-icon">&#xe640;</i>{:lang('del')}</a>
-            <a data-href="{:url('del')}?ids=1&all=1" class="layui-btn layui-btn-primary j-ajax" confirm="{:lang('clear_confirm')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
+            <a data-href="{:url('del')}?ids=1&all=1" data-method="post" class="layui-btn layui-btn-primary j-ajax" confirm="{:lang('clear_confirm')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
 
         </div>
     </div>

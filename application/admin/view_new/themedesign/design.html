@@ -1929,7 +1929,7 @@ layui.use(['form','layer','upload','element'], function () {
     // upload (contract: returns {code:1, file:"<path>"})
     function bindUpload(elemId, cb) {
         upload.render({
-            elem: '#' + elemId, url: TD_URLS.upload, method: 'post', field: 'file', data: { theme: TD_THEME },
+            elem: '#' + elemId, url: TD_URLS.upload, method: 'post', field: 'file', data: { theme: TD_THEME, __token__: TD_TOKEN }, headers: { 'X-CSRF-Token': TD_TOKEN },
             before: function () { layer.msg(LANG.uploading, { time: 30000 }); },
             done: function (res) {
                 layer.closeAll('loading'); layer.closeAll('dialog'); layer.closeAll();

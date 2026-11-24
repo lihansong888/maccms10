@@ -57,6 +57,9 @@ class Gbook extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('param_err'));
+            }
             $param = input();
 
             $notifyGbookId = 0;
@@ -95,6 +98,9 @@ class Gbook extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $all = $param['all'];
@@ -116,6 +122,9 @@ class Gbook extends Base
 
     public function field()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         $col = $param['col'];

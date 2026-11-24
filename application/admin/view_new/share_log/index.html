@@ -22,7 +22,7 @@
 
         <div class="flex gap-5 overflow-x-auto overflow-y-hidden">
             <a data-href="{:url('del')}" class="layui-btn layui-btn-primary j-page-btns confirm"><i class="layui-icon">&#xe640;</i>{:lang('del')}</a>
-            <a data-href="{:url('del')}?all=1" class="layui-btn layui-btn-primary j-ajax" confirm="{:lang('share/admin_title')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
+            <a data-href="{:url('del')}?all=1" class="layui-btn layui-btn-primary j-ajax" data-method="post" confirm="{:lang('share/admin_title')}"><i class="layui-icon">&#xe640;</i>{:lang('clear')}</a>
         </div>
     </div>
 
@@ -54,7 +54,7 @@
                 <td>{$vo.share_platform|htmlspecialchars}</td>
                 <td>{$vo.share_time|mac_day='color'}</td>
                 <td>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['share_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['share_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

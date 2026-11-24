@@ -1,6 +1,7 @@
 <?php
 namespace app\common\model;
 use think\image\Exception;
+use app\common\util\HttpClient;
 
 class Image extends Base {
 
@@ -20,8 +21,9 @@ class Image extends Base {
         if (!in_array($ext, explode(',', $upload_image_ext))) {
             $ext = 'jpg';
         }
-        // 远程图片来自采集源等第三方主机，可能自签/过期/域名不匹配，显式关闭校验以保兼容。
-        $img = mac_curl_get($url, [], '', false);
+        // 远程图片 URL 可能来自采集内容，必须逐跳校验公网 IP 并固定连接地址；
+        // 保留第三方图片证书兼容性，但不能再用会自动跟随重定向的裸 mac_curl_get。
+        $img = HttpClient::safeGet($url, 30, false, 3);
         if (empty($img) || strlen($img) < 10) {
             return $url . '#err';
         }

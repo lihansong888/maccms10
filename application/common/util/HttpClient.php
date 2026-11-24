@@ -51,7 +51,7 @@ class HttpClient
      * @param bool $verifySsl 第三方采集站常见自签 / 过期证书，调用方可显式关闭（连接仍钉在已校验公网 IP）
      * @return string|false 响应体；地址不合规 / 非公网 / 请求失败返回 false
      */
-    public static function safeGet($url, $timeout = 20, $verifySsl = true, $maxRedirects = 3)
+    public static function safeGet($url, $timeout = 20, $verifySsl = true, $maxRedirects = 3, $heads = array())
     {
         $url = (string)$url;
         for ($hop = 0; $hop <= $maxRedirects; $hop++) {
@@ -79,6 +79,9 @@ class HttpClient
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, max(2, min(15, intval($timeout))));
             curl_setopt($ch, CURLOPT_TIMEOUT, max(3, intval($timeout)));
             curl_setopt($ch, CURLOPT_HEADER, 0);
+            if (is_array($heads) && count($heads) > 0) {
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $heads);
+            }
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verifySsl ? true : false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verifySsl ? 2 : 0);
             $body = @curl_exec($ch);

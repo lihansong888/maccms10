@@ -67,6 +67,9 @@ class Type extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
             $validate = \think\Loader::validate('Token');
             if(!$validate->check($param)){

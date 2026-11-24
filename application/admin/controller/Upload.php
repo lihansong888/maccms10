@@ -37,6 +37,9 @@ class Upload extends Base
 
     public function upload($p=[])
     {
+        if (!request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('illegal_request')]);
+        }
 		return model('Upload')->upload($p);
     }
 

@@ -7,6 +7,24 @@ class Cj extends Base
 {
     var $_isall=0;
 
+    /**
+     * 定时采集器会在同一请求内调用本控制器；仅放行明确的 api/timming/index 内部调用。
+     * 直接访问后台采集动作仍必须使用带 CSRF 令牌的 POST。
+     */
+    private function isInternalTimmingRequest()
+    {
+        $request = Request();
+        return strtolower((string)$request->module()) === 'api'
+            && strtolower((string)$request->controller()) === 'timming'
+            && strtolower((string)$request->action()) === 'index';
+    }
+
+    private function collectionRequestAllowed()
+    {
+        return $this->isInternalTimmingRequest()
+            || (Request()->isPost() && $this->adminCsrfOk());
+    }
+
     public function __construct()
     {
         parent::__construct();
@@ -136,7 +154,7 @@ class Cj extends Base
 
     public function col_all($param)
     {
-        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+        if (!$this->collectionRequestAllowed()) {
             return $this->error(lang('token_err'));
         }
         $this->_isall=1;
@@ -146,7 +164,7 @@ class Cj extends Base
 
     //采集网址
     public function col_url($param=[]) {
-        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+        if (!$this->collectionRequestAllowed()) {
             return $this->error(lang('token_err'));
         }
         if(empty($param)){
@@ -226,7 +244,7 @@ class Cj extends Base
 
     //采集文章
     public function col_content($param=[]) {
-        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+        if (!$this->collectionRequestAllowed()) {
             return $this->error(lang('token_err'));
         }
         if(empty($param)){
@@ -375,7 +393,7 @@ class Cj extends Base
 
     public function content_into($param=[])
     {
-        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+        if (!$this->collectionRequestAllowed()) {
             return $this->error(lang('token_err'));
         }
         if(empty($param)){

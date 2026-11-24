@@ -86,6 +86,19 @@ if (isset($template['del'])) {
         '[template_delete] Template::del must enforce template directory boundary');
 }
 
+// 模板编辑器默认关闭；即使管理员显式开启，也只能读写 template 根目录内的真实文件。
+$templateInfo = rt_functions(APP_PATH . 'admin/controller/Template.php');
+rt_check(isset($templateInfo['info']), '[template_editor] Template::info missing');
+if (isset($templateInfo['info'])) {
+    $body = $templateInfo['info']['body'];
+    rt_check(strpos($body, "realpath(ROOT_PATH . 'template')") !== false
+        && strpos($body, "realpath(ROOT_PATH . substr(\$fullname, 2))") !== false
+        && strpos($body, 'strpos($target, $templatePrefix)') !== false,
+        '[template_editor] Template::info must confine file access to the real template root');
+    rt_check(strpos($body, "Loader::validate('Token')") !== false,
+        '[template_editor] Template::info writes must retain CSRF token validation');
+}
+
 // Base::adminCsrfOk 必须走与 CsrfGuard 相同的判定，且不读全局开关
 $base = rt_functions(APP_PATH . 'admin/controller/Base.php');
 rt_check(isset($base['adminCsrfOk']), '[forced_csrf] Base::adminCsrfOk missing');

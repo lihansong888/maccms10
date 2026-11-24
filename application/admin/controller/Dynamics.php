@@ -41,6 +41,9 @@ class Dynamics extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'] ?? '';
         $all = $param['all'] ?? '';

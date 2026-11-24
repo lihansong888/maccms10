@@ -84,7 +84,7 @@ rt_check(substr_count($addonView, "type: 'post'") >= 2, '[addon_csrf] addon stat
 
 $extraActions = [
     'Index' => ['clear','check_back_link'],
-    'Database' => ['uploadStorage','import','optimize','repair'],
+    'Database' => ['uploadStorage','import','optimize','repair','export','sql','rep'],
     'Task' => ['log_del'],
     'User' => ['generateInviteCode'],
     'Cj' => ['content_del','content_into'],

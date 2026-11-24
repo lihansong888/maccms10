@@ -118,10 +118,15 @@ class Update extends Base
             ob_flush();flush();
             $pre = config('database.prefix');
             $schema = Db::query('select * from information_schema.columns where table_schema = ?',[ config('database.database') ]);
+            $tableSchema = Db::query('select TABLE_NAME, ENGINE from information_schema.tables where table_schema = ?',[ config('database.database') ]);
             $col_list = [];
+            $engine_list = [];
             $sql='';
             foreach($schema as $k=>$v){
                 $col_list[$v['TABLE_NAME']][$v['COLUMN_NAME']] = $v;
+            }
+            foreach($tableSchema as $tableInfo){
+                $engine_list[$tableInfo['TABLE_NAME']] = $tableInfo['ENGINE'];
             }
             @include $sql_file;
             //dump($sql);die;

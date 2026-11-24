@@ -28,4 +28,8 @@ $view = file_get_contents(APP_PATH . 'admin/view_new/template/index.html');
 rt_check(strpos($view, 'j-tr-del" data-method="post"') !== false, 'template row deletion sends POST');
 rt_check(strpos($view, '$.post("{:url(\'template/del\')}"') !== false, 'template bulk deletion sends POST');
 
+$adsView = file_get_contents(APP_PATH . 'admin/view_new/template/ads.html');
+rt_check(strpos($adsView, 'j-tr-del" data-method="post"') !== false, 'template ad row deletion sends POST');
+rt_check(strpos($adsView, '$.post("{:url(\'template/del\')}"') !== false, 'template ad bulk deletion sends POST');
+
 rt_done('template path safety');

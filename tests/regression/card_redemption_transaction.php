@@ -22,6 +22,12 @@ foreach ([
     rt_check(strpos($body, $needle) !== false, '[card_tx] ' . $message);
 }
 
+$start = strpos($body, 'Db::startTrans();');
+$log = strpos($body, "model('Plog')->saveData(");
+$commit = strpos($body, 'Db::commit();');
+rt_check($start !== false && $log !== false && $commit !== false && $start < $log && $log < $commit,
+    '[card_tx] card claim, point credit and log write must remain inside one transaction');
+
 $install = file_get_contents(ROOT_PATH . 'application/install/sql/install.sql');
 rt_check($install !== false, '[card_tx] unable to read install SQL');
 foreach (['user', 'card', 'msg', 'plog'] as $table) {

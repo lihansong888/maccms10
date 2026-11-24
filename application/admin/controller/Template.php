@@ -161,10 +161,20 @@ class Template extends Base
         $fullname = $fpath .'/' .$fname;
         $fullname = str_replace('\\','/',$fullname);
 
-        if( (substr($fullname,0,10) != "./template") || count( explode("./",$fullname) ) > 2) {
-            $this->error(lang('param_err').'2');
-            return;
+        // 仅允许访问 template 根目录内真实存在的文件，阻止 ../ 与符号链接逃逸。
+        if (strpos($fullname, './template/') !== 0) {
+            return $this->error(lang('param_err').'2');
         }
+        $templateRoot = realpath(ROOT_PATH . 'template');
+        $target = realpath(ROOT_PATH . substr($fullname, 2));
+        if ($templateRoot === false || $target === false || !is_file($target)) {
+            return $this->error(lang('param_err').'2');
+        }
+        $templatePrefix = rtrim($templateRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (strpos($target, $templatePrefix) !== 0) {
+            return $this->error(lang('param_err').'2');
+        }
+        $fullname = $target;
         $path = pathinfo($fullname);
         if(!empty($fname)) {
             $extarr = array('html', 'htm', 'js', 'xml');

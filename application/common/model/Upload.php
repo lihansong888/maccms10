@@ -44,11 +44,24 @@ class Upload extends Base {
 
         $param['from'] = empty($param['from']) ? '' : $param['from'];
         $param['input'] = empty($param['input']) ? 'file' : $param['input'];
-        $param['flag'] = empty($param['flag']) ? 'vod' : $param['flag'];
+        $param['flag'] = empty($param['flag']) ? 'vod' : trim((string)$param['flag']);
+        // flag is a single upload-directory name, never a path. Reject separators,
+        // dot segments and unexpected characters before constructing filesystem paths.
+        if (!preg_match('/\\A[a-zA-Z0-9_-]{1,32}\\z/D', $param['flag'])) {
+            return self::upload_return(lang('admin/upload/forbidden_ext'), $param['from']);
+        }
         $param['thumb'] = empty($param['thumb']) ? '0' : $param['thumb'];
         $param['thumb_class'] = empty($param['thumb_class']) ? '' : $param['thumb_class'];
         $param['user_id'] = empty($param['user_id']) ? '0' : $param['user_id'];
-        $base64_img = $param['imgdata'];
+        // Avatar paths are derived only from the authenticated user, not request input.
+        if ($param['flag'] === 'user') {
+            $currentUserId = isset($GLOBALS['user']['user_id']) ? intval($GLOBALS['user']['user_id']) : 0;
+            if ($currentUserId < 1) {
+                return self::upload_return(lang('model/user/not_login'), $param['from']);
+            }
+            $param['user_id'] = $currentUserId;
+        }
+        $base64_img = isset($param['imgdata']) ? $param['imgdata'] : '';
         $data = [];
         $config = (array)config('maccms.site');
         $pre= $config['install_dir'];

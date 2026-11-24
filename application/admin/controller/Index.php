@@ -184,7 +184,11 @@ class Index extends Base
 
     public function clear()
     {
-        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+        $request = Request();
+        $isInternalTimming = strtolower((string)$request->module()) === 'api'
+            && strtolower((string)$request->controller()) === 'timming'
+            && strtolower((string)$request->action()) === 'index';
+        if (!$isInternalTimming && (!Request()->isPost() || !$this->adminCsrfOk())) {
             return $this->error(lang('token_err'));
         }
         $res = $this->_cache_clear();

@@ -282,6 +282,9 @@ class Art extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('token_err'));
+            }
             $param = input('post.');
             $contentLang = $param['content_lang'] ?? [];
             unset($param['content_lang']);

@@ -38,6 +38,9 @@ class Link extends Base
     public function info()
     {
         if (Request()->isPost()) {
+            if (!$this->adminCsrfOk()) {
+                return $this->error(lang('param_err'));
+            }
             $param = input();
             $contentLang = $param['content_lang'] ?? [];
             unset($param['content_lang']);
@@ -89,6 +92,9 @@ class Link extends Base
      */
     public function contentLangTranslate()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $text = (string)input('post.text', '');
         $from = (string)input('post.from', mac_content_lang_default());
         $to = (string)input('post.to', '');
@@ -107,6 +113,9 @@ class Link extends Base
 
     public function del()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
 
@@ -124,6 +133,9 @@ class Link extends Base
 
     public function batch()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('param_err'));
+        }
         $param = input();
         $ids = $param['ids'];
         foreach ($ids as $k=>$id) {

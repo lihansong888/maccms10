@@ -289,7 +289,7 @@ CREATE TABLE `mac_card` (
   KEY `card_use_time` (`card_use_time`) USING BTREE,
   KEY `card_no` (`card_no`),
   KEY `card_pwd` (`card_pwd`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ;
 
 -- ----------------------------
 -- Table structure for mac_cash
@@ -649,7 +649,7 @@ CREATE TABLE `mac_msg` (
   KEY `msg_code` (`msg_code`),
   KEY `msg_time` (`msg_time`),
   KEY `user_id` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for mac_notify

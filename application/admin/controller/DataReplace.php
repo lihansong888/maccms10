@@ -33,6 +33,9 @@ class DataReplace extends Base
      */
     public function doReplace()
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return json(['code' => 0, 'msg' => lang('token_err')]);
+        }
         $param = input('post.');
         $table = trim($param['table'] ?? '');
         $field = trim($param['field'] ?? '');

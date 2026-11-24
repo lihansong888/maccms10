@@ -1401,6 +1401,43 @@ class User extends Base
     }
 
 
+    /**
+     * 原子预留一次找回密码验证码尝试。锁文件位于 runtime/cache，避免 File Cache 的读改写竞争。
+     *
+     * @param string $key
+     * @return int|false
+     */
+    protected function reserveFindpassAttempt($key)
+    {
+        $lockDir = defined('RUNTIME_PATH') ? rtrim(RUNTIME_PATH, '/\\') . DIRECTORY_SEPARATOR . 'cache' : ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR . 'cache';
+        if (!is_dir($lockDir) && !@mkdir($lockDir, 0700, true) && !is_dir($lockDir)) {
+            return false;
+        }
+        $lockFile = $lockDir . DIRECTORY_SEPARATOR . 'findpass_attempts.lock';
+        $fp = @fopen($lockFile, 'c');
+        if ($fp === false || !@flock($fp, LOCK_EX)) {
+            if (is_resource($fp)) {
+                fclose($fp);
+            }
+            return false;
+        }
+
+        try {
+            $attempts = (int)Cache::get($key, 0);
+            if ($attempts >= 5) {
+                return $attempts;
+            }
+            $next = $attempts + 1;
+            if (!Cache::set($key, $next, 600)) {
+                return false;
+            }
+            return $next;
+        } finally {
+            @flock($fp, LOCK_UN);
+            @fclose($fp);
+        }
+    }
+
     public function findpass_reset($param)
     {
         $to_src = trim(isset($param['user_email']) ? $param['user_email'] : '');
@@ -1425,16 +1462,19 @@ class User extends Base
         $param['type'] = 2;
         $param['to']   = $to_src;
 
-        // 找回密码验证码失败尝试限速：按 IP + 收件目标分别计数，10 分钟最多 5 次
+        // 找回密码验证码尝试限速：按 IP + 收件目标分别计数，10 分钟最多 5 次。
+        // 文件缓存驱动的 Cache::inc 是读改写，不具备并发原子性；用共享锁保护检查+递增。
         $attemptKey = 'maccms_findpass_attempt_' . md5(strtolower((string)$param['ac']) . '|' . strtolower($to_src) . '|' . (string)mac_get_ip_long());
-        $attempts = (int)Cache::get($attemptKey);
+        $attempts = $this->reserveFindpassAttempt($attemptKey);
+        if ($attempts === false) {
+            return ['code' => 2011, 'msg' => '验证码服务暂不可用，请稍后重试'];
+        }
         if ($attempts >= 5) {
             return ['code' => 2010, 'msg' => '验证码尝试次数过多，请 10 分钟后再试'];
         }
 
         $res = $this->check_msg($param);
         if($res['code'] >1){
-            Cache::set($attemptKey, $attempts + 1, 600);
             return ['code'=>$res['code'],'msg'=>$res['msg']];
         }
         $msg_id = $res['msg_id'];

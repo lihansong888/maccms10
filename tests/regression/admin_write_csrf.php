@@ -15,10 +15,20 @@ $forced = [
     'Coupon'        => ['save', 'del', 'field'],
     'Database'      => ['export', 'uploadStorage', 'import', 'optimize', 'repair', 'del'],
     'Group'         => ['info', 'del', 'field'],
+    'Live'          => ['info', 'del', 'field'],
+    'Notify'        => ['broadcast', 'del', 'field'],
     'Order'         => ['del'],
+    'Plog'          => ['del'],
     'ResourceCheck' => ['enable', 'disable'],
     'Seckill'       => ['save', 'del', 'field'],
+    'Task'          => ['info', 'del', 'field', 'log_del'],
     'Template'      => ['del'],
+    'Timming'       => ['del', 'field'],
+    'UserPm'        => ['del', 'field'],
+    'Cj'            => ['info', 'del', 'import'],
+    'Vod'           => ['info', 'restore', 'del', 'field', 'audit'],
+    'Vodplayer'     => ['del', 'field'],
+    'Vodserver'     => ['del', 'field'],
 ];
 foreach ($forced as $cls => $fns) {
     $funcs = rt_functions(APP_PATH . "admin/controller/{$cls}.php");
@@ -28,6 +38,7 @@ foreach ($forced as $cls => $fns) {
             rt_check(strpos($funcs[$fn]['body'], '$this->adminCsrfOk()') !== false,
                 "[forced_csrf] {$cls}::{$fn}: must call \$this->adminCsrfOk() (global security_csrf_admin is off by default)");
             $postGuard = strpos($funcs[$fn]['body'], 'Request()->isPost()') !== false
+                || strpos($funcs[$fn]['body'], 'request()->isPost()') !== false
                 || strpos($funcs[$fn]['body'], '$this->request->isPost()') !== false;
             // ResourceCheck::enable/disable share a private targetIds() helper that rejects non-POST requests.
             if (!$postGuard && strpos($funcs[$fn]['body'], 'targetIds()') !== false && isset($funcs['targetIds'])) {

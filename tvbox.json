@@ -1,0 +1,13 @@
+{
+  "sites": [
+    {
+      "key": "hansong_maccms",
+      "name": "寒松影视",
+      "type": 1,
+      "api": "https://tv.lihansong.top/api.php/provide/vod/",
+      "searchable": 1,
+      "quickSearch": 1,
+      "filterable": 1
+    }
+  ]
+}

@@ -23,12 +23,17 @@ jobs:
           php -l application/common/model/Collect.php
           php -l application/common/model/Card.php
           php -l application/admin/controller/Template.php
+          php -l application/common/model/Website.php
+          php -l application/common/model/Actor.php
           php -l tests/regression/ssrf_collection.php
           php -l tests/regression/card_redemption_transaction.php
           php -l tests/regression/template_path_safety.php
+          php -l tests/regression/sql_order_injection.php
       - name: Collection SSRF regression
         run: php tests/regression/ssrf_collection.php
       - name: Card redemption regression
         run: php tests/regression/card_redemption_transaction.php
       - name: Template path regression
         run: php tests/regression/template_path_safety.php
+      - name: SQL order injection regression
+        run: php tests/regression/sql_order_injection.php

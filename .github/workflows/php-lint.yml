@@ -35,3 +35,6 @@ jobs:
             -not -path './vendor/*' \
             -not -path './thinkphp/*' \
             -print0)
+
+      - name: Regression test admin CSRF protection
+        run: php tests/regression/admin_write_csrf.php

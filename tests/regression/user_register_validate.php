@@ -136,4 +136,22 @@ assert_true(
     'User::register() must not use module-relative Loader::validate(\'User\').'
 );
 
-echo 'OK: user register validation regression test passed.' . PHP_EOL;
+$resetBody = extract_method_body($userModel, 'findpass_reset');
+assert_true($resetBody !== false, 'Unable to locate User::findpass_reset() body.');
+assert_true(
+    strpos($resetBody, "where(['user_id' => intval($user['user_id'])])") !== false,
+    'Password reset must update only the single matched user ID, not every duplicate email/phone.'
+);
+assert_true(
+    strpos($resetBody, 'if ($res !== 1)') !== false,
+    'Password reset must roll back unless exactly one user row was updated.'
+);
+assert_true(
+    strpos($resetBody, 'Db::startTrans();') !== false
+        && strpos($resetBody, "Db::name('msg')->where") !== false
+        && strpos($resetBody, 'Db::commit();') !== false
+        && strpos($resetBody, 'Db::rollback();') !== false,
+    'Password reset must consume the verification code and update the password inside one transaction.'
+);
+
+echo 'OK: user register validation and password reset transaction regression test passed.' . PHP_EOL;

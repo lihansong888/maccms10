@@ -16,7 +16,18 @@ class HttpClient
      */
     public static function curlPostWithTimeout($url, $data, $heads, $timeout, $isPost = true, $followRedirects = false)
     {
+        $parts = @parse_url((string)$url);
+        if (!is_array($parts)
+            || empty($parts['scheme'])
+            || !in_array(strtolower($parts['scheme']), array('http', 'https'), true)
+            || empty($parts['host'])
+            || isset($parts['user'])
+            || isset($parts['pass'])
+            || (isset($parts['port']) && ($parts['port'] < 1 || $parts['port'] > 65535))) {
+            return false;
+        }
         $ch = @curl_init();
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -51,9 +62,10 @@ class HttpClient
      * @param bool $verifySsl 第三方采集站常见自签 / 过期证书，调用方可显式关闭（连接仍钉在已校验公网 IP）
      * @return string|false 响应体；地址不合规 / 非公网 / 请求失败返回 false
      */
-    public static function safeGet($url, $timeout = 20, $verifySsl = true, $maxRedirects = 3, $heads = array())
+    public static function safeGet($url, $timeout = 20, $verifySsl = true, $maxRedirects = 3, $heads = array(), &$httpCode = null)
     {
         $url = (string)$url;
+        $httpCode = 0;
         for ($hop = 0; $hop <= $maxRedirects; $hop++) {
             $parts = @parse_url($url);
             if (!is_array($parts)
@@ -86,6 +98,7 @@ class HttpClient
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verifySsl ? 2 : 0);
             $body = @curl_exec($ch);
             $code = intval(curl_getinfo($ch, CURLINFO_HTTP_CODE));
+            $httpCode = $code;
             $next = in_array($code, array(301, 302, 303, 307, 308), true) ? (string)curl_getinfo($ch, CURLINFO_REDIRECT_URL) : '';
             @curl_close($ch);
             if ($next === '') {

@@ -237,7 +237,7 @@
                     fd.set('rule_threshold', document.querySelector('input[name=rule_threshold_analytics]').value);
                 }
             }
-            fetch(SAVE_URL, {method: 'POST', body: fd, credentials: 'same-origin'})
+            fetch(SAVE_URL, {method: 'POST', body: fd, credentials: 'same-origin', headers: {'X-CSRF-Token': window.__MAC_ADMIN_CSRF__ || ''}})
                 .then(function (r) { return r.json(); })
                 .then(function (res) {
                     layer.msg(res.msg);

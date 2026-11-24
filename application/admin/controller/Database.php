@@ -154,6 +154,9 @@ class Database extends Base
      */
     public function uploadStorage($id = '')
     {
+        if (!Request()->isPost() || !$this->adminCsrfOk()) {
+            return $this->error(lang('token_err'));
+        }
         $id = intval($id);
         if ($id <= 0) {
             return $this->error(lang('admin/database/select_file'));

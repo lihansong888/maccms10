@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use think\Db;
 use think\Request;
+use app\common\util\CsrfGuard;
 
 /**
  * 续播 / 播放进度记忆
@@ -16,6 +17,8 @@ use think\Request;
  */
 class Ulog extends Base
 {
+    use CsrfGuard;
+
     public function __construct()
     {
         parent::__construct();
@@ -44,6 +47,11 @@ class Ulog extends Base
             return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         }
         $uid = intval($check['info']['user_id']);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $param    = $request->post();
         $vodId    = intval($param['vod_id'] ?? 0);
@@ -162,6 +170,11 @@ class Ulog extends Base
             return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         }
         $uid = intval($check['info']['user_id']);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $param = $request->post();
         $list  = $param['list'] ?? '';
@@ -276,6 +289,11 @@ class Ulog extends Base
             return json(['code' => 1401, 'msg' => lang('api/please_login_first')]);
         }
         $uid = intval($check['info']['user_id']);
+        $viaBearer = \app\common\util\JwtService::bearerFromRequest() !== '' && \app\common\util\JwtService::isEnabled();
+        if (!$viaBearer) {
+            $csrfErr = $this->checkCsrf();
+            if ($csrfErr !== null) return json($csrfErr);
+        }
 
         $param = $request->post();
         $vodId = intval($param['vod_id'] ?? 0);

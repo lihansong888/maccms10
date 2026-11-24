@@ -59,6 +59,8 @@ foreach (['rule_save','rule_del','rule_field','rule_enable_recommended','rule_te
 }
 $monitorView = file_get_contents(APP_PATH . 'admin/view_new/monitor/rule.html');
 rt_check(strpos($monitorView, "X-CSRF-Token") !== false, '[monitor_csrf] fetch actions send token header');
+$monitorInfoView = file_get_contents(APP_PATH . 'admin/view_new/monitor/rule_info.html');
+rt_check(strpos($monitorInfoView, "X-CSRF-Token") !== false, '[monitor_csrf] rule save sends token header');
 rt_check(strpos($monitorView, "fetch(DEL_URL, {method: 'POST'") !== false, '[monitor_csrf] rule deletion uses POST');
 
 $notify = rt_functions(APP_PATH . 'admin/controller/Notify.php');

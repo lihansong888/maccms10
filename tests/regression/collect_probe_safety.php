@@ -20,6 +20,27 @@ rt_check(isset($commonFns['mac_check_back_link'])
     && strpos($commonFns['mac_check_back_link']['body'], 'mac_curl_get(') === false,
     '[ssrf_probe] mac_check_back_link must not use redirect-following legacy curl helper');
 
+// 外部影视资料源也使用不可信的可配置 URL 模板，必须走逐跳公网 IP 校验；
+// 不允许继续使用可自动跟随重定向的通用 curl 请求。
+foreach ([
+    'DoubanExternalSourceProvider' => APP_PATH . 'common/util/DoubanExternalSourceProvider.php',
+    'ImdbExternalSourceProvider' => APP_PATH . 'common/util/ImdbExternalSourceProvider.php',
+    'TmdbExternalSourceProvider' => APP_PATH . 'common/util/TmdbExternalSourceProvider.php',
+    'AiCatalogLinkFetcher' => APP_PATH . 'common/util/AiCatalogLinkFetcher.php',
+] as $provider => $file) {
+    $src = (string)@file_get_contents($file);
+    rt_check(strpos($src, 'HttpClient::safeGet(') !== false, "[ssrf_provider] {$provider}: outbound GET must use HttpClient::safeGet()");
+    if ($provider !== 'AiCatalogLinkFetcher') {
+        rt_check(strpos($src, 'curlPostWithTimeout(') === false, "[ssrf_provider] {$provider}: unsafe redirect-following HTTP helper remains");
+    }
+}
+$httpSrc = (string)@file_get_contents(APP_PATH . 'common/util/HttpClient.php');
+rt_check(strpos($httpSrc, 'CURLOPT_HTTPHEADER, $heads') !== false, '[ssrf_provider] safeGet must preserve caller headers');
+rt_check(strpos($httpSrc, '&$httpCode = null') !== false, '[ssrf_provider] safeGet must expose final HTTP status for callers');
+rt_check(strpos($httpSrc, 'CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS') !== false, '[ssrf_provider] generic HTTP client must restrict URL protocols');
+$aiSrc = (string)@file_get_contents(APP_PATH . 'common/util/AiProvider.php');
+rt_check(strpos($aiSrc, 'CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS') !== false, '[ssrf_provider] AI provider must restrict URL protocols');
+
 // ─── 列 ssrf_probe：探测「采集源下发的不可信地址」的工具，每个建 curl 句柄的函数都必须钉 IP、不自动跟随、限协议 ───
 // 登记：读取采集源 / 资源站中心下发地址并发起请求的工具文件。新增同类探测工具必须登记到这里。
 $probeFiles = [

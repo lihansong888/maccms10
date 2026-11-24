@@ -61,7 +61,7 @@
                 </td>
                 <td>
                     <a href="{:url('info?id='.$vo['seckill_id'])}" class="layui-badge-rim">{:lang('edit')}</a>
-                    <a class="layui-badge-rim j-tr-del" data-href="{:url('del?ids='.$vo['seckill_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
+                    <a class="layui-badge-rim j-tr-del" data-method="post" data-href="{:url('del?ids='.$vo['seckill_id'])}" href="javascript:;" title="{:lang('del')}">{:lang('del')}</a>
                 </td>
             </tr>
             {/volist}

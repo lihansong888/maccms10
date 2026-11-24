@@ -152,7 +152,7 @@ assert_true(
         && strpos($resetBody, 'if ($attempts > 5)') !== false,
     'Password reset throttle must allow five attempts and reject the sixth.');
 assert_true(
-    strpos($resetBody, "where(['user_id' => intval($user['user_id'])])") !== false,
+    strpos($resetBody, 'where([\'user_id\' => intval($user[\'user_id\'])])') !== false,
     'Password reset must update only the single matched user ID, not every duplicate email/phone.'
 );
 assert_true(

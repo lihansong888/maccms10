@@ -36,8 +36,8 @@ class Gbook extends Base
                 'msg'  => '参数错误: ' . $validate->getError(),
             ]);
         }
-        // 查询条件组装
-        $where = [];
+        // 公开接口仅返回已审核留言，不能通过 status 参数枚举未审核内容。
+        $where = ['gbook_status' => 1];
 
         $offset = isset($param['offset']) ? (int)$param['offset'] : 0;
         $limit = isset($param['limit']) ? (int)$param['limit'] : 20;
@@ -52,10 +52,6 @@ class Gbook extends Base
 
         if (isset($param['user_id'])) {
             $where['user_id'] = (int)$param['user_id'];
-        }
-
-        if (isset($param['status'])) {
-            $where['gbook_status'] = (int)$param['status'];
         }
 
         if (isset($param['name']) && strlen($param['name']) > 0) {
@@ -80,7 +76,8 @@ class Gbook extends Base
         if ($total > 0) {
             // 排序
             $order = "gbook_time DESC";
-            $field = '*';
+            // 不向公开 API 暴露 gbook_ip 等内部字段。
+            $field = 'gbook_id,gbook_rid,gbook_name,gbook_content,gbook_reply,gbook_time,gbook_reply_time';
             if (strlen($param['orderby']) > 0) {
                 $order = 'gbook_' . $param['orderby'] . " DESC";
             }
@@ -106,6 +103,7 @@ class Gbook extends Base
      */
     public function submit(Request $request)
     {
+        if (!$request->isPost()) return json(['code' => 1001, 'msg' => lang('param_err')]);
         $content = trim($request->param('gbook_content', ''));
         if (empty($content)) return json(['code' => 1004, 'msg' => lang('index/require_content')]);
         $cookie = 'gbook_timespan';

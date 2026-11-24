@@ -73,14 +73,15 @@ class Comment extends Base
             }
         }
 
-        if($GLOBALS['config']['comment']['login'] ==1){
-            if(empty(cookie('user_id'))){
-                return ['code' => 1003, 'msg' =>lang('index/require_login')];
-            }
-            $res = model('User')->checkLogin();
-            if($res['code']>1) {
-                return ['code' => 1003, 'msg' => lang('index/require_login')];
-            }
+        // 始终验证登录身份，不能仅凭可伪造的 user_id/user_name Cookie 认定用户。
+        $authUser = null;
+        $loginResult = model('User')->checkLogin();
+        if (isset($loginResult['code']) && intval($loginResult['code']) === 1
+            && !empty($loginResult['info']) && is_array($loginResult['info'])) {
+            $authUser = $loginResult['info'];
+        }
+        if ($GLOBALS['config']['comment']['login'] == 1 && empty($authUser)) {
+            return ['code' => 1003, 'msg' => lang('index/require_login')];
         }
 
         if(empty($param['comment_content'])){
@@ -101,16 +102,14 @@ class Comment extends Base
             return ['code'=>1006,'msg'=>lang('index/mid_err')];
         }
 
-        if(empty(cookie('user_id'))){
+        if (empty($authUser)) {
+            $param['user_id'] = 0;
             $param['comment_name'] = lang('controller/visitor');
-        }
-        else{
-            $param['comment_name'] = cookie('user_name');
-            $param['user_id'] = intval(cookie('user_id'));
-            $user_data = model('User')->field('user_nick_name')->where(['user_id' => $param['user_id']])->find();
-            if (!empty($user_data['user_nick_name'])) {
-                $param['comment_name'] = $user_data['user_nick_name'];
-            }
+        } else {
+            $param['user_id'] = intval($authUser['user_id']);
+            $param['comment_name'] = !empty($authUser['user_nick_name'])
+                ? $authUser['user_nick_name']
+                : $authUser['user_name'];
         }
         $param['comment_name'] = htmlentities(trim($param['comment_name']));
         $param['comment_rid'] = intval($param['comment_rid']);
@@ -140,7 +139,19 @@ class Comment extends Base
             }
         }
 
-        $res = model('Comment')->saveData($param);
+        // 公开评论入口只允许创建新评论；白名单字段阻止伪造 comment_id、
+        // comment_up/down、comment_report 等字段进行越权更新或数据篡改。
+        $saveData = [
+            'comment_name'    => $param['comment_name'],
+            'comment_content' => $param['comment_content'],
+            'comment_mid'     => intval($param['comment_mid']),
+            'comment_rid'     => intval($param['comment_rid']),
+            'comment_pid'     => intval($param['comment_pid']),
+            'comment_status'  => intval($param['comment_status']),
+            'comment_ip'      => $param['comment_ip'],
+            'user_id'         => intval($param['user_id']),
+        ];
+        $res = model('Comment')->saveData($saveData);
         if($res['code']>1){
             return $res;
         }
